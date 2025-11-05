@@ -131,6 +131,47 @@ CREATE POLICY "Users can insert their own settings"
 CREATE POLICY "Users can update their own settings"
     ON app_settings FOR UPDATE
     USING (auth.uid() = user_id);
+
+-- Tabelle für Tore/Türen
+CREATE TABLE gates (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    customer_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    width NUMERIC,
+    height NUMERIC,
+    material TEXT,
+    color TEXT,
+    price NUMERIC,
+    notes TEXT,
+    config JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+);
+
+-- Index für gates
+CREATE INDEX idx_gates_user_id ON gates(user_id);
+CREATE INDEX idx_gates_customer_id ON gates(customer_id);
+
+-- Row Level Security für gates
+ALTER TABLE gates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own gates"
+    ON gates FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own gates"
+    ON gates FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own gates"
+    ON gates FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own gates"
+    ON gates FOR DELETE
+    USING (auth.uid() = user_id);
 ```
 
 4. Klicken Sie auf **"Run"** (oder drücken Sie Strg+Enter)

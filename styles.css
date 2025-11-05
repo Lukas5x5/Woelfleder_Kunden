@@ -601,6 +601,93 @@ body {
     background: var(--primary-hover);
 }
 
+/* Gates List */
+.gates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gate-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--light-bg);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.gate-item:hover {
+    background: white;
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.gate-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.gate-info {
+    flex: 1;
+}
+
+.gate-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 4px;
+}
+
+.gate-details-mini {
+    font-size: 13px;
+    color: var(--secondary-color);
+}
+
+.gate-arrow {
+    font-size: 20px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.product-item {
+    padding: 10px;
+    background: var(--light-bg);
+    border-radius: 6px;
+}
+
+.product-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.product-details {
+    font-size: 13px;
+    color: var(--secondary-color);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
+}
+
+.error-state {
+    color: var(--danger-color);
+}
+
 .modal-footer {
     padding: 20px 25px;
     border-top: 2px solid var(--border-color);

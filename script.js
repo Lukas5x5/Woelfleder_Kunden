@@ -456,6 +456,13 @@ function showCustomerDetails(id) {
         ` : ''}
 
         <div class="details-section">
+            <h3>Tore & Türen <span id="gatesLoadingIndicator"></span></h3>
+            <div id="gatesListContainer">
+                <div class="empty-state">Lade Tore/Türen...</div>
+            </div>
+        </div>
+
+        <div class="details-section">
             <div class="detail-item">
                 <div class="detail-label">Erstellt am</div>
                 <div class="detail-value">${new Date(customer.createdAt).toLocaleString('de-DE')}</div>
@@ -465,6 +472,9 @@ function showCustomerDetails(id) {
 
     document.getElementById('detailsModal').classList.add('active');
     currentEditId = id;
+
+    // Tore/Türen laden
+    loadAndDisplayGates(customer.id);
 }
 
 // Edit from Details Modal
@@ -879,6 +889,226 @@ function getDocumentIcon(filename) {
         'png': '🖼️'
     };
     return icons[ext] || '📄';
+}
+
+// ========== TORE/TÜREN FUNCTIONS ==========
+
+// Load and display gates for a customer
+async function loadAndDisplayGates(customerId) {
+    const container = document.getElementById('gatesListContainer');
+    const indicator = document.getElementById('gatesLoadingIndicator');
+
+    if (!container) return;
+
+    // Show loading
+    indicator.innerHTML = '<span style="font-size: 12px; color: #6c757d;">⏳ Lädt...</span>';
+
+    try {
+        const gates = await loadGatesForCustomer(customerId);
+
+        indicator.innerHTML = '';
+
+        if (gates.length === 0) {
+            container.innerHTML = '<div class="empty-state">Noch keine Tore/Türen erstellt</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="gates-list">
+                ${gates.map(gate => `
+                    <div class="gate-item" onclick="showGateDetails('${gate.id}')">
+                        <div class="gate-icon">🚪</div>
+                        <div class="gate-info">
+                            <div class="gate-name">${escapeHtml(gate.name || gate.type || 'Tor/Tür')}</div>
+                            <div class="gate-details-mini">
+                                ${gate.width && gate.height ? `${gate.width}m × ${gate.height}m` : 'Keine Maße'}
+                                ${gate.price ? ` • ${formatCurrency(gate.price)}` : ''}
+                            </div>
+                        </div>
+                        <div class="gate-arrow">→</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading gates:', error);
+        indicator.innerHTML = '';
+        container.innerHTML = '<div class="empty-state error-state">Fehler beim Laden der Tore</div>';
+    }
+}
+
+// Show gate details modal
+async function showGateDetails(gateId) {
+    try {
+        const gate = await loadGateDetails(gateId);
+
+        if (!gate) {
+            alert('Tor nicht gefunden');
+            return;
+        }
+
+        const config = gate.config || {};
+
+        const modalContent = `
+            <div class="gate-details-modal">
+                <h2>🚪 ${escapeHtml(gate.name || gate.type || 'Tor/Tür')}</h2>
+
+                <div class="details-section">
+                    <h3>Abmessungen</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Breite</div>
+                            <div class="detail-value">${gate.width || '-'} m</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Höhe</div>
+                            <div class="detail-value">${gate.height || '-'} m</div>
+                        </div>
+                        ${config.glashoehe ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Glashöhe</div>
+                                <div class="detail-value">${config.glashoehe} m</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                ${config.gesamtflaeche || config.glasflaeche || config.torflaeche ? `
+                    <div class="details-section">
+                        <h3>Flächen</h3>
+                        <div class="details-grid">
+                            ${config.gesamtflaeche ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Gesamtfläche</div>
+                                    <div class="detail-value">${config.gesamtflaeche.toFixed(2)} m²</div>
+                                </div>
+                            ` : ''}
+                            ${config.glasflaeche ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Glasfläche</div>
+                                    <div class="detail-value">${config.glasflaeche.toFixed(2)} m²</div>
+                                </div>
+                            ` : ''}
+                            ${config.torflaeche ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Torfläche</div>
+                                    <div class="detail-value">${config.torflaeche.toFixed(2)} m²</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${config.selectedProducts && config.selectedProducts.length > 0 ? `
+                    <div class="details-section">
+                        <h3>Produkte (${config.selectedProducts.length})</h3>
+                        <div class="products-list">
+                            ${config.selectedProducts.map(product => `
+                                <div class="product-item">
+                                    <div class="product-name">${escapeHtml(product.name || product.title || 'Produkt')}</div>
+                                    <div class="product-details">
+                                        ${product.quantity ? `Menge: ${product.quantity}` : ''}
+                                        ${product.sides ? ` • ${product.sides}` : ''}
+                                        ${product.total ? ` • ${formatCurrency(product.total)}` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${config.subtotal || config.aufschlag || gate.price ? `
+                    <div class="details-section">
+                        <h3>Preise</h3>
+                        <div class="details-grid">
+                            ${config.subtotal ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Zwischensumme</div>
+                                    <div class="detail-value">${formatCurrency(config.subtotal)}</div>
+                                </div>
+                            ` : ''}
+                            ${config.aufschlag ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Aufschlag</div>
+                                    <div class="detail-value">${config.aufschlag}%</div>
+                                </div>
+                            ` : ''}
+                            ${config.exklusiveMwst ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Exkl. MwSt</div>
+                                    <div class="detail-value">${formatCurrency(config.exklusiveMwst)}</div>
+                                </div>
+                            ` : ''}
+                            ${gate.price ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Gesamt inkl. MwSt</div>
+                                    <div class="detail-value" style="font-weight: 600; color: var(--primary-color);">${formatCurrency(gate.price)}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${gate.notes ? `
+                    <div class="details-section">
+                        <h3>Notizen</h3>
+                        <div class="detail-item">
+                            <div class="detail-value">${escapeHtml(gate.notes).replace(/\n/g, '<br>')}</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="details-section">
+                    <div class="detail-item">
+                        <div class="detail-label">Erstellt am</div>
+                        <div class="detail-value">${new Date(gate.created_at || gate.createdAt).toLocaleString('de-DE')}</div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeGateDetailsModal()">Schließen</button>
+                </div>
+            </div>
+        `;
+
+        // Create and show gate details modal
+        let gateModal = document.getElementById('gateDetailsModal');
+        if (!gateModal) {
+            gateModal = document.createElement('div');
+            gateModal.id = 'gateDetailsModal';
+            gateModal.className = 'modal';
+            gateModal.innerHTML = `
+                <div class="modal-content">
+                    <div id="gateDetailsContent"></div>
+                </div>
+            `;
+            document.body.appendChild(gateModal);
+        }
+
+        document.getElementById('gateDetailsContent').innerHTML = modalContent;
+        gateModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Error showing gate details:', error);
+        alert('Fehler beim Laden der Tor-Details');
+    }
+}
+
+// Close gate details modal
+function closeGateDetailsModal() {
+    const modal = document.getElementById('gateDetailsModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Format currency helper
+function formatCurrency(value) {
+    if (!value && value !== 0) return '-';
+    return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR'
+    }).format(value);
 }
 
 // Close modal when clicking outside

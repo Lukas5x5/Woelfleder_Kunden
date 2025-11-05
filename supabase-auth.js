@@ -366,6 +366,54 @@ async function deleteCustomerFromCloud(customerId) {
     }
 }
 
+// ============================================
+// TORE/TÜREN FUNKTIONEN
+// ============================================
+
+// Tore für einen Kunden laden
+async function loadGatesForCustomer(customerId) {
+    if (!supabaseClient || !currentUser) {
+        return [];
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('gates')
+            .select('*')
+            .eq('customer_id', customerId)
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('Error loading gates:', error);
+        return [];
+    }
+}
+
+// Tor-Details laden
+async function loadGateDetails(gateId) {
+    if (!supabaseClient || !currentUser) {
+        return null;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('gates')
+            .select('*')
+            .eq('id', gateId)
+            .eq('user_id', currentUser.id)
+            .single();
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error loading gate details:', error);
+        return null;
+    }
+}
+
 // App initialisieren
 document.addEventListener('DOMContentLoaded', () => {
     const isSupabaseConfigured = initSupabase();
