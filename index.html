@@ -76,12 +76,9 @@
                     <h1>Wölfleder - Außendienst Manager</h1>
                 </div>
                 <div class="header-actions">
-                    <a href="https://lukas5x5.github.io/Woelfleder_Tueren_Tore_Kalkulator/" class="app-switcher" target="_blank">
-                        🚪 Tore & Türen App
+                    <a href="https://lukas5x5.github.io/Woelfleder_Tueren_Tore_Kalkulator/" class="app-switcher-compact" target="_blank" title="Zur Tore & Türen App">
+                        🚪
                     </a>
-                    <button class="btn btn-secondary" onclick="showInstallInstructions()" title="Zum iPhone Startbildschirm hinzufügen">
-                        <span>📱</span> iPhone
-                    </button>
                     <span id="userEmail" class="user-email"></span>
                     <button class="btn btn-settings" onclick="showSettingsModal()">
                         <span>⚙️</span> Einstellungen
@@ -111,25 +108,30 @@
         </div>
 
         <!-- Dashboard Stats -->
-        <div class="stats-grid">
+        <div class="stats">
             <div class="stat-card">
-                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statTotal">0</div>
                 <div class="stat-label">Gesamt Kunden</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="statTermine">0</div>
-                <div class="stat-label">Anstehende Termine</div>
+                <div class="stat-icon">📅</div>
+                <div class="stat-value" id="statTermine">0</div>
+                <div class="stat-label">Termine</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="statAnfragen">0</div>
-                <div class="stat-label">Offene Anfragen</div>
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="statAnfragen">0</div>
+                <div class="stat-label">Anfragen</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="statAuftraege">0</div>
-                <div class="stat-label">Aktive Aufträge</div>
+                <div class="stat-icon">📦</div>
+                <div class="stat-value" id="statAuftraege">0</div>
+                <div class="stat-label">Aufträge</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="statFollowUp">0</div>
+                <div class="stat-icon">🔔</div>
+                <div class="stat-value" id="statFollowUp">0</div>
                 <div class="stat-label">Wiedervorlage</div>
             </div>
         </div>
