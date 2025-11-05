@@ -422,8 +422,13 @@ function showCustomerDetails(id) {
                 <h3>Fotos (${customer.photos.length})</h3>
                 <div class="photo-gallery">
                     ${customer.photos.map((photo, i) => `
-                        <div class="gallery-item" onclick="window.open('${photo}', '_blank')">
-                            <img src="${photo}" alt="Foto ${i + 1}">
+                        <div class="gallery-item-wrapper">
+                            <div class="gallery-item" onclick="window.open('${photo}', '_blank')">
+                                <img src="${photo}" alt="Foto ${i + 1}">
+                            </div>
+                            <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${customer.id}', ${i})">
+                                📥 Download
+                            </button>
                         </div>
                     `).join('')}
                 </div>
@@ -437,11 +442,12 @@ function showCustomerDetails(id) {
                     ${customer.documents.map((doc, i) => `
                         <div class="document-item">
                             <div class="document-info">
-                                <span class="document-icon">📄</span>
-                                <span class="document-name">${doc.name}</span>
+                                <span class="document-icon">${getDocumentIcon(doc.name)}</span>
+                                <span class="document-name">${escapeHtml(doc.name)}</span>
                             </div>
                             <div class="document-actions">
-                                <button class="document-btn" onclick="downloadDocument('${customer.id}', ${i})">↓ Download</button>
+                                <button class="document-btn" onclick="viewDocument('${customer.id}', ${i})">👁️ Ansehen</button>
+                                <button class="document-btn" onclick="downloadDocument('${customer.id}', ${i})">📥 Download</button>
                             </div>
                         </div>
                     `).join('')}
@@ -835,6 +841,44 @@ function downloadDocument(customerId, docIndex) {
         link.download = doc.name;
         link.click();
     }
+}
+
+// Download Photo
+function downloadPhoto(customerId, photoIndex) {
+    const customer = customers.find(c => c.id === customerId);
+    if (customer && customer.photos && customer.photos[photoIndex]) {
+        const photo = customer.photos[photoIndex];
+        const link = document.createElement('a');
+        link.href = photo;
+        link.download = `${customer.name}_Foto_${photoIndex + 1}.jpg`;
+        link.click();
+    }
+}
+
+// View Document in new tab
+function viewDocument(customerId, docIndex) {
+    const customer = customers.find(c => c.id === customerId);
+    if (customer && customer.documents && customer.documents[docIndex]) {
+        const doc = customer.documents[docIndex];
+        window.open(doc.data, '_blank');
+    }
+}
+
+// Get Document Icon based on file type
+function getDocumentIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const icons = {
+        'pdf': '📕',
+        'doc': '📘',
+        'docx': '📘',
+        'xls': '📗',
+        'xlsx': '📗',
+        'txt': '📄',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️'
+    };
+    return icons[ext] || '📄';
 }
 
 // Close modal when clicking outside
