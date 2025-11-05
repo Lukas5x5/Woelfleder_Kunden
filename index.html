@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wölfleder Außendienst Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="logo.png" alt="Wölfleder Logo" class="login-logo" id="loginLogo">
+                <h1>Wölfleder Außendienst Manager</h1>
+                <p>Melden Sie sich an, um fortzufahren</p>
+            </div>
+
+            <div id="loginForm" class="auth-form">
+                <h2>Anmelden</h2>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Anmelden</button>
+                </form>
+                <p class="auth-switch">
+                    Noch kein Account? <a href="#" onclick="showRegisterForm()">Registrieren</a>
+                </p>
+            </div>
+
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <h2>Registrieren</h2>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                        <small>Mindestens 6 Zeichen</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort wiederholen</label>
+                        <input type="password" id="registerPasswordConfirm" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Registrieren</button>
+                </form>
+                <p class="auth-switch">
+                    Bereits registriert? <a href="#" onclick="showLoginForm()">Anmelden</a>
+                </p>
+            </div>
+
+            <div id="authMessage" class="auth-message"></div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="logo.png" alt="Wölfleder Logo" class="logo-img" id="logoImg">
+                <h1>Wölfleder - Außendienst Manager</h1>
+            </div>
+            <div class="header-actions">
+                <span id="userEmail" class="user-email"></span>
+                <button class="btn btn-settings" onclick="showSettingsModal()">
+                    <span>⚙️</span> Einstellungen
+                </button>
+                <button class="btn btn-primary" onclick="showNewCustomerModal()">
+                    <span>➕</span> Neuer Kunde
+                </button>
+                <button class="btn btn-secondary" onclick="handleLogout()">
+                    <span>🚪</span> Abmelden
+                </button>
+            </div>
+        </header>
+
+        <!-- Filter & Search -->
+        <div class="filter-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Kunde suchen...">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Alle</button>
+                <button class="filter-btn" data-filter="anfrage">Anfrage</button>
+                <button class="filter-btn" data-filter="termin">Termin</button>
+                <button class="filter-btn" data-filter="angebot">Angebot</button>
+                <button class="filter-btn" data-filter="auftrag">Auftrag</button>
+                <button class="filter-btn" data-filter="abgeschlossen">Abgeschlossen</button>
+                <button class="filter-btn" data-filter="followup">📅 Später kontaktieren</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-label">Gesamt Kunden</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statTermine">0</div>
+                <div class="stat-label">Anstehende Termine</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statAnfragen">0</div>
+                <div class="stat-label">Offene Anfragen</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statAuftraege">0</div>
+                <div class="stat-label">Aktive Aufträge</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statFollowUp">0</div>
+                <div class="stat-label">Wiedervorlage</div>
+            </div>
+        </div>
+
+        <!-- Customers List -->
+        <div class="customers-section">
+            <h2>Kundenliste</h2>
+            <div id="customersList" class="customers-list">
+                <!-- Customers will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: New/Edit Customer -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Neuer Kunde</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="customerForm" class="customer-form">
+                <input type="hidden" id="customerId">
+
+                <div class="form-group">
+                    <label>Kundenname *</label>
+                    <input type="text" id="customerName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="tel" id="customerPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="customerEmail">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Adresse</label>
+                    <textarea id="customerAddress" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quelle *</label>
+                        <select id="customerSource" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="email">Email</option>
+                            <option value="telefon">Telefon</option>
+                            <option value="mundpropaganda">Mundpropaganda</option>
+                            <option value="firma">Firma direkt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Auftragstyp *</label>
+                        <select id="customerType" required>
+                            <option value="">Bitte wählen</option>
+                            <option value="nur-angebot">Nur Angebot</option>
+                            <option value="ausmessen-tore">Ausmessen Tore</option>
+                            <option value="stall-zeichnen">Stall zeichnen + ausmessen</option>
+                            <option value="bestellung">Bestellung/Auftrag</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="customerStatus" required>
+                            <option value="anfrage">Anfrage</option>
+                            <option value="termin">Termin vereinbart</option>
+                            <option value="angebot">Angebot erstellt</option>
+                            <option value="auftrag">Auftrag erteilt</option>
+                            <option value="abgeschlossen">Abgeschlossen</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Termin</label>
+                        <input type="datetime-local" id="customerAppointment">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sage Angebotsnummer</label>
+                        <input type="text" id="customerSageRef">
+                    </div>
+                    <div class="form-group">
+                        <label>Wiedervorlage / Später kontaktieren</label>
+                        <input type="date" id="customerFollowUp">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notizen</label>
+                    <textarea id="customerNotes" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Fotos</label>
+                    <input type="file" id="customerPhotos" accept="image/*" multiple>
+                    <div id="photoPreview" class="photo-preview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dokumente (Angebote, PDFs, etc.)</label>
+                    <input type="file" id="customerDocuments" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple>
+                    <div id="documentPreview" class="document-preview"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Customer Details -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="detailsName"></h2>
+                <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div id="detailsContent" class="details-content">
+                <!-- Details will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDetailsModal()">Schließen</button>
+                <button class="btn btn-primary" onclick="editFromDetails()">Bearbeiten</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Settings -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Einstellungen</h2>
+                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3>Logo hochladen</h3>
+                    <input type="file" id="logoUpload" accept="image/*">
+                    <button class="btn btn-secondary btn-small" onclick="resetLogo()">Logo zurücksetzen</button>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Eigene Auftragstypen</h3>
+                    <div id="customTypesList" class="custom-types-list">
+                        <!-- Custom types will be displayed here -->
+                    </div>
+                    <div class="add-type-form">
+                        <input type="text" id="newTypeName" placeholder="Neuer Auftragstyp..." class="settings-input">
+                        <button class="btn btn-primary btn-small" onclick="addCustomType()">➕ Hinzufügen</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Daten sichern & wiederherstellen</h3>
+                    <div class="backup-actions">
+                        <button class="btn btn-primary" onclick="exportData()">📥 Daten exportieren</button>
+                        <label class="btn btn-secondary" style="margin: 0; cursor: pointer;">
+                            📤 Daten importieren
+                            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDataFromFile(this.files[0])">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script src="supabase-auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
