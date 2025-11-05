@@ -1,21 +1,35 @@
 -- Tabelle für Tore/Türen erstellen
 -- WICHTIG: Führe dieses SQL in deinem Supabase SQL Editor aus!
 
+DROP TABLE IF EXISTS gates CASCADE;
+
 CREATE TABLE gates (
     id TEXT PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     customer_id TEXT NOT NULL,
-    type TEXT NOT NULL,
-    width NUMERIC,
-    height NUMERIC,
-    material TEXT,
-    color TEXT,
-    price NUMERIC,
+    name TEXT,
+    type TEXT,
+    gate_type TEXT,
+    notizen TEXT,
     notes TEXT,
+    breite NUMERIC,
+    width NUMERIC,
+    hoehe NUMERIC,
+    height NUMERIC,
+    glashoehe NUMERIC,
+    gesamtflaeche NUMERIC,
+    glasflaeche NUMERIC,
+    torflaeche NUMERIC,
+    selected_products JSONB DEFAULT '[]'::jsonb,
+    aufschlag NUMERIC DEFAULT 0,
+    subtotal NUMERIC DEFAULT 0,
+    aufschlag_betrag NUMERIC DEFAULT 0,
+    exklusive_mwst NUMERIC DEFAULT 0,
+    inkl_mwst NUMERIC DEFAULT 0,
+    price NUMERIC,
     config JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Index für schnellere Suche

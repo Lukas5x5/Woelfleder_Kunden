@@ -1127,3 +1127,17 @@ window.onclick = function(event) {
         closeSettingsModal();
     }
 }
+
+// iPhone Installation Instructions
+function showInstallInstructions() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+    if (isIOS && !isInStandaloneMode) {
+        alert('📱 Zum iPhone Startbildschirm hinzufügen:\n\n1. Tippe auf das Teilen-Symbol (□↑) unten\n2. Scrolle nach unten\n3. Wähle "Zum Home-Bildschirm"\n4. Tippe auf "Hinzufügen"\n\nDie App erscheint dann als Icon auf deinem Startbildschirm!');
+    } else if (isIOS && isInStandaloneMode) {
+        alert('✅ Die App ist bereits auf deinem Startbildschirm installiert!');
+    } else {
+        alert('ℹ️ Diese Funktion ist nur auf iPhone/iPad verfügbar.\n\nAuf Android: Öffne das Menü (⋮) und wähle "Zum Startbildschirm hinzufügen"');
+    }
+}

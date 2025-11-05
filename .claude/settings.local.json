@@ -7,7 +7,10 @@
       "Bash(git commit:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git reset:*)",
+      "Bash(script.js)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

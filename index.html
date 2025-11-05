@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wölfleder Außendienst Manager</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles-modern.css">
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -69,21 +70,29 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo">
-                <img src="logo.png" alt="Wölfleder Logo" class="logo-img" id="logoImg">
-                <h1>Wölfleder - Außendienst Manager</h1>
-            </div>
-            <div class="header-actions">
-                <span id="userEmail" class="user-email"></span>
-                <button class="btn btn-settings" onclick="showSettingsModal()">
-                    <span>⚙️</span> Einstellungen
-                </button>
-                <button class="btn btn-primary" onclick="showNewCustomerModal()">
-                    <span>➕</span> Neuer Kunde
-                </button>
-                <button class="btn btn-secondary" onclick="handleLogout()">
-                    <span>🚪</span> Abmelden
-                </button>
+            <div class="header-container">
+                <div class="logo">
+                    <img src="logo.png" alt="Wölfleder Logo" class="logo-img" id="logoImg">
+                    <h1>Wölfleder - Außendienst Manager</h1>
+                </div>
+                <div class="header-actions">
+                    <a href="https://lukas5x5.github.io/Woelfleder_Tueren_Tore_Kalkulator/" class="app-switcher" target="_blank">
+                        🚪 Tore & Türen App
+                    </a>
+                    <button class="btn btn-secondary" onclick="showInstallInstructions()" title="Zum iPhone Startbildschirm hinzufügen">
+                        <span>📱</span> iPhone
+                    </button>
+                    <span id="userEmail" class="user-email"></span>
+                    <button class="btn btn-settings" onclick="showSettingsModal()">
+                        <span>⚙️</span> Einstellungen
+                    </button>
+                    <button class="btn btn-primary" onclick="showNewCustomerModal()">
+                        <span>➕</span> Neuer Kunde
+                    </button>
+                    <button class="btn btn-secondary" onclick="handleLogout()">
+                        <span>🚪</span> Abmelden
+                    </button>
+                </div>
             </div>
         </header>
 
