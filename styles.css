@@ -866,61 +866,215 @@ body {
     margin-right: 10px;
 }
 
+/* Remember Me Checkbox */
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.remember-me input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
     .header {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         text-align: center;
+        padding: 15px;
     }
 
     .logo {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .logo-img {
+        height: 40px;
     }
 
     .logo h1 {
-        font-size: 20px;
+        font-size: 18px;
+    }
+
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .header-actions button {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .user-email {
+        font-size: 12px;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    .filter-section {
+        padding: 10px;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .filter-buttons {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .filter-btn {
+        font-size: 12px;
+        padding: 8px 12px;
     }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .customers-section {
+        padding: 10px;
+    }
+
+    .customers-section h2 {
+        font-size: 18px;
+    }
+
+    .customer-card {
+        padding: 12px;
+    }
+
+    .customer-header h3 {
+        font-size: 16px;
+    }
+
+    .customer-info-item {
+        font-size: 13px;
+    }
+
+    .customer-actions {
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .btn-small {
+        font-size: 12px;
+        padding: 6px 12px;
     }
 
     .form-row {
         grid-template-columns: 1fr;
     }
 
-    .filter-buttons {
-        justify-content: center;
-    }
-
-    .customer-actions {
-        flex-direction: column;
-    }
-
     .modal-content {
-        margin: 0;
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 14px;
+    }
+
+    .login-container {
+        padding: 25px;
+        margin: 15px;
+    }
+
+    .login-header h1 {
+        font-size: 20px;
+    }
+
+    .login-logo {
+        height: 60px;
     }
 }
 
 @media (max-width: 480px) {
-    .container {
+    .header {
         padding: 10px;
+    }
+
+    .logo h1 {
+        font-size: 16px;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     .stat-card {
-        padding: 15px;
-    }
-
-    .modal {
         padding: 10px;
     }
 
-    .modal.active {
-        padding-top: 20px;
+    .customer-actions {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .customer-actions button {
+        width: 100%;
+    }
+
+    .modal {
+        padding: 5px;
+    }
+
+    .modal-content {
+        margin: 5px;
+        max-width: calc(100% - 10px);
+    }
+
+    .login-container {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .filter-buttons {
+        gap: 4px;
+    }
+
+    .filter-btn {
+        font-size: 11px;
+        padding: 6px 10px;
     }
 }

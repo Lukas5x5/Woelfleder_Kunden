@@ -19,7 +19,13 @@ function initSupabase() {
 
     try {
         const { createClient } = supabase;
-        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // persistSession auf true setzen für "Angemeldet bleiben"
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true
+            }
+        });
         console.log('✅ Supabase initialisiert');
         return true;
     } catch (error) {
