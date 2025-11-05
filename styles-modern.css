@@ -24,54 +24,59 @@ body {
 }
 
 /* ========================================
-   MOBILE-FIRST HEADER
+   PROFESSIONAL MOBILE HEADER
    ======================================== */
 
 .header {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
+    border-bottom: 0.5px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding: 12px 0;
-    transition: var(--transition);
+    padding: 10px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .header-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
 }
 
 .logo-img {
-    height: 32px;
+    height: 28px;
     width: auto;
+    flex-shrink: 0;
 }
 
 .logo h1 {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-primary);
-    letter-spacing: -0.4px;
+    letter-spacing: -0.3px;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    flex-shrink: 0;
 }
 
 /* Compact App Switcher */
@@ -79,22 +84,27 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 16px;
     text-decoration: none;
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+    flex-shrink: 0;
 }
 
 .app-switcher-compact:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transform: scale(1.08);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+}
+
+.app-switcher-compact:active {
+    transform: scale(0.95);
 }
 
 .user-email {
@@ -104,25 +114,25 @@ body {
 }
 
 /* ========================================
-   MOBILE-OPTIMIZED SEARCH & FILTERS
+   PROFESSIONAL SEARCH & FILTERS
    ======================================== */
 
 .filter-section {
     max-width: 1200px;
-    margin: 16px auto;
-    padding: 0 16px;
+    margin: 12px auto 16px;
+    padding: 0 12px;
 }
 
 .search-input {
     width: 100%;
-    padding: 14px 16px 14px 44px;
+    padding: 12px 16px;
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    font-size: 17px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 16px;
     color: var(--text-primary);
     transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     -webkit-appearance: none;
     appearance: none;
 }
@@ -130,19 +140,20 @@ body {
 .search-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.1);
+    box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .search-input::placeholder {
     color: var(--text-secondary);
+    font-weight: 400;
 }
 
 .filter-buttons {
     display: flex;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 6px;
+    margin-top: 10px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -153,26 +164,32 @@ body {
 
 .filter-btn {
     flex-shrink: 0;
-    padding: 8px 16px;
+    padding: 6px 14px;
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-size: 15px;
-    font-weight: 500;
+    border: 1.5px solid var(--border-color);
+    border-radius: 18px;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
 }
 
+.filter-btn:active {
+    transform: scale(0.95);
+}
+
 .filter-btn.active {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(200, 16, 46, 0.25);
 }
 
-.filter-btn:hover {
-    background: rgba(200, 16, 46, 0.08);
+.filter-btn:hover:not(.active) {
+    background: rgba(200, 16, 46, 0.06);
+    border-color: rgba(200, 16, 46, 0.2);
 }
 
 .filter-btn.active:hover {
@@ -180,71 +197,62 @@ body {
 }
 
 /* ========================================
-   STATISTICS CARDS - MOBILE OPTIMIZED
+   STATISTICS CARDS - ULTRA COMPACT MOBILE
    ======================================== */
 
 .stats {
     max-width: 1200px;
-    margin: 20px auto;
+    margin: 16px auto;
     padding: 0 16px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.stats::-webkit-scrollbar {
+    display: none;
 }
 
 .stat-card {
     background: var(--card-bg);
-    border-radius: var(--radius-md);
-    padding: 16px;
+    border-radius: 12px;
+    padding: 12px;
     box-shadow: var(--shadow-sm);
     border: 0.5px solid var(--border-color);
     transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: var(--transition);
+    flex-shrink: 0;
+    min-width: 90px;
+    text-align: center;
 }
 
 .stat-card:active {
-    transform: scale(0.98);
-}
-
-.stat-card:hover::before {
-    transform: scaleX(1);
+    transform: scale(0.95);
 }
 
 .stat-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
+    font-size: 20px;
+    margin-bottom: 4px;
     display: block;
 }
 
 .stat-value {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--primary-color);
     line-height: 1;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     letter-spacing: -0.5px;
 }
 
 .stat-label {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-secondary);
     text-transform: none;
     letter-spacing: 0;
+    line-height: 1.2;
 }
 
 /* ========================================
@@ -477,66 +485,74 @@ body {
 }
 
 /* ========================================
-   BUTTONS - MOBILE OPTIMIZED
+   BUTTONS - ULTRA COMPACT MOBILE
    ======================================== */
 
 .btn {
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 15px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
     border: none;
     cursor: pointer;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 4px;
     white-space: nowrap;
 }
 
 .btn-primary {
     background: var(--primary-color);
     color: white;
-    box-shadow: 0 2px 8px rgba(200, 16, 46, 0.3);
+    box-shadow: 0 2px 6px rgba(200, 16, 46, 0.25);
 }
 
 .btn-primary:hover {
     background: var(--primary-dark);
-    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.4);
+    box-shadow: 0 3px 10px rgba(200, 16, 46, 0.35);
 }
 
 .btn-primary:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 .btn-secondary {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
 }
 
 .btn-settings {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--text-primary);
+    padding: 7px;
+    min-width: 34px;
 }
 
+.btn-settings:active {
+    transform: scale(0.95);
+}
+
+/* Mobile: Nur Icons zeigen */
 @media (max-width: 767px) {
-    .btn span {
-        display: inline;
+    .btn span:first-child {
+        font-size: 16px;
     }
 
-    .btn {
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-
-    /* Hide text on small screens, show only icons */
-    .btn-settings span + *,
-    .btn-secondary span + *,
-    .btn-primary span + * {
+    .btn span:last-child:not(:first-child) {
         display: none;
+    }
+
+    .btn-primary {
+        padding: 7px 12px;
     }
 }
