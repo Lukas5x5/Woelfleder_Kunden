@@ -1169,7 +1169,7 @@ async function showNewOrderModal(customerId) {
     document.getElementById('orderId').value = '';
     document.getElementById('orderCustomerId').value = customerId;
 
-    // Generate order number preview
+    // Suggest order number, but user can edit it
     if (typeof orderService !== 'undefined') {
         const orderNumber = await orderService.generateOrderNumber(customerId);
         document.getElementById('orderNumber').value = orderNumber;
@@ -1216,8 +1216,16 @@ async function handleOrderSubmit(event) {
 
     const orderId = document.getElementById('orderId').value;
     const customerId = document.getElementById('orderCustomerId').value;
+    const orderNumber = document.getElementById('orderNumber').value;
+
+    // Validate order number
+    if (!orderNumber || orderNumber.trim() === '') {
+        alert('Bitte geben Sie eine Auftragsnummer ein');
+        return;
+    }
 
     const orderData = {
+        orderNumber: orderNumber,
         type: document.getElementById('orderType').value,
         status: document.getElementById('orderStatus').value,
         sageRef: document.getElementById('orderSageRef').value,

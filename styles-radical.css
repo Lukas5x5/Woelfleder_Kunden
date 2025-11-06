@@ -1047,6 +1047,7 @@ body:not(.logged-out) .login-screen {
     top: 0;
     background: white;
     z-index: 1;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .modal-header h2 {

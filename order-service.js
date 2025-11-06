@@ -125,7 +125,9 @@ class OrderService {
 
         try {
             const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            const orderNumber = await this.generateOrderNumber(customerId);
+
+            // Use provided order number or generate one
+            const orderNumber = orderData.orderNumber || await this.generateOrderNumber(customerId);
 
             const newOrder = {
                 id: orderId,
