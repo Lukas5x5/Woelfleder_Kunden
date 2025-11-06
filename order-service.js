@@ -104,6 +104,8 @@ class OrderService {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
+
+            console.log(`📋 Loaded ${data?.length || 0} gates for order ${orderId}`, data);
             return data || [];
         } catch (error) {
             console.error('Error loading gates for order:', error);
