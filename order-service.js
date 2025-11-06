@@ -172,6 +172,7 @@ class OrderService {
 
         try {
             const updateData = {
+                order_number: orderData.orderNumber,  // FIX: Order number jetzt auch beim Update
                 type: orderData.type,
                 status: orderData.status,
                 sage_ref: orderData.sageRef || '',

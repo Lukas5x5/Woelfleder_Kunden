@@ -16,7 +16,8 @@
       "Bash(git log:*)",
       "Bash(timeout 3 cmd:*)",
       "Bash(curl:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "Bash(dir \"C:\\Users\\LRAus\\Desktop\\Kunden_Programm\\tt-app\")"
     ],
     "deny": [],
     "ask": []
