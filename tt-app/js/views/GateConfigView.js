@@ -229,10 +229,10 @@ function updateSummaryOnly() {
 /**
  * Back to type select
  */
-window.backToTypeSelect = async function() {
+window.backToTypeSelect = function() {
     if (confirm('Möchten Sie wirklich zurück? Nicht gespeicherte Änderungen gehen verloren.')) {
         AppState.clearCurrentGate();
-        await AppState.goToTypeSelect();
+        AppState.goToTypeSelect();
     }
 };
 
@@ -388,19 +388,6 @@ window.saveGate = function() {
         return;
     }
 
-    // IMPORTANT: Recalculate totals before saving to ensure all pricing fields are up-to-date
-    const categoryData = productsByCategory[gate.gateType];
-    const allProducts = [...categoryData.main, ...categoryData.accessories, ...generalAccessories];
-    const calculations = CalculationService.calculateTotal(gate, allProducts, categoryData.main);
-    gate.updateCalculations(calculations);
-
-    console.log('💾 Saving gate with calculations:', {
-        subtotal: calculations.subtotal,
-        aufschlagBetrag: calculations.aufschlagBetrag,
-        exklusiveMwst: calculations.exklusiveMwst,
-        inklMwst: calculations.inklMwst
-    });
-
     // Show save modal
     openSaveGateModal();
 };
@@ -462,13 +449,50 @@ function generateProductNotes(gate) {
 /**
  * Open save gate modal
  */
-function openSaveGateModal() {
+async function openSaveGateModal() {
     const gate = AppState.currentGate;
+    const customer = AppState.currentCustomer;
     const modalBody = document.getElementById('gateModalBody');
     const modalTitle = document.querySelector('#gateModal .modal-title');
 
+    if (!customer) {
+        alert('Kein Kunde ausgewählt');
+        return;
+    }
+
     // Generate product notes if not already set
     const productNotes = gate.notizen || generateProductNotes(gate);
+
+    // Load orders for this customer
+    let ordersHTML = '<option value="">Lade Aufträge...</option>';
+
+    try {
+        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            const { data: orders, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('customer_id', customer.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            if (orders && orders.length > 0) {
+                ordersHTML = '<option value="">-- Auftrag wählen --</option>';
+                orders.forEach(order => {
+                    const selected = gate.orderId === order.id ? 'selected' : '';
+                    const statusLabel = getStatusLabel(order.status);
+                    ordersHTML += `<option value="${order.id}" ${selected}>
+                        ${order.order_number} - ${order.type} (${statusLabel})
+                    </option>`;
+                });
+            } else {
+                ordersHTML = '<option value="">Keine Aufträge vorhanden - Bitte zuerst Auftrag erstellen</option>';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        ordersHTML = '<option value="">Fehler beim Laden der Aufträge</option>';
+    }
 
     modalTitle.textContent = 'Tor speichern';
     modalBody.innerHTML = `
@@ -478,6 +502,17 @@ function openSaveGateModal() {
                 <input type="text" id="gateName" name="name"
                        value="${gate.name || ''}" required
                        placeholder="z.B. Haupteingang, Garage, ...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="gateOrderId">Auftrag *</label>
+                <select id="gateOrderId" name="orderId" required
+                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem;">
+                    ${ordersHTML}
+                </select>
+                <small style="color: #6b7280; font-size: 0.85rem;">
+                    Wählen Sie den Auftrag, zu dem dieses Tor gehört
+                </small>
             </div>
 
             <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -502,10 +537,24 @@ function openSaveGateModal() {
 }
 
 /**
+ * Get status label in German
+ */
+function getStatusLabel(status) {
+    const labels = {
+        'anfrage': 'Anfrage',
+        'termin': 'Termin',
+        'angebot': 'Angebot',
+        'auftrag': 'Auftrag',
+        'abgeschlossen': 'Abgeschlossen'
+    };
+    return labels[status] || status;
+}
+
+/**
  * Handle gate save
  * @param {Event} event
  */
-window.handleGateSave = async function(event) {
+window.handleGateSave = function(event) {
     event.preventDefault();
 
     const formData = new FormData(event.target);
@@ -513,21 +562,29 @@ window.handleGateSave = async function(event) {
 
     if (!gate) return;
 
+    // Get form values
     gate.name = formData.get('name');
     gate.notizen = formData.get('notizen');
+    gate.orderId = formData.get('orderId');
+
+    // Validate order selection
+    if (!gate.orderId || gate.orderId.trim() === '') {
+        alert('Bitte wählen Sie einen Auftrag aus');
+        return;
+    }
 
     // Check if editing existing gate
     if (gate.id && AppState.currentCustomer.getGate(gate.id)) {
         // Update existing
-        await AppState.updateGate(gate.id, gate.toJSON());
+        AppState.updateGate(gate.id, gate.toJSON());
     } else {
         // Add new
-        await AppState.addGate(gate.toJSON());
+        AppState.addGate(gate.toJSON());
     }
 
     closeModal('gateModal');
     AppState.clearCurrentGate();
-    await AppState.goToTypeSelect();
+    AppState.goToTypeSelect();
 };
 
 /**
