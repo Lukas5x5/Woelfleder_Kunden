@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#c8102e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wölfleder Tore">
+
+    <title>Wölfleder - Türen & Tore Kalkulator</title>
+
+    <!-- Supabase Client (für Sync mit Kunden-App) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./supabase-auth.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./tt-app/css/variables.css">
+    <link rel="stylesheet" href="./tt-app/css/base.css">
+    <link rel="stylesheet" href="./tt-app/css/main.css">
+    <link rel="stylesheet" href="./tt-app/css/components/header.css">
+    <link rel="stylesheet" href="./tt-app/css/components/buttons.css">
+    <link rel="stylesheet" href="./tt-app/css/components/cards.css">
+    <link rel="stylesheet" href="./tt-app/css/components/forms.css">
+    <link rel="stylesheet" href="./tt-app/css/components/modal.css">
+    <link rel="stylesheet" href="./tt-app/css/views/customer-view.css">
+    <link rel="stylesheet" href="./tt-app/css/views/type-view.css">
+    <link rel="stylesheet" href="./tt-app/css/views/config-view.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div id="progress-steps"></div>
+        <div id="app"></div>
+    </div>
+
+    <!-- Home Button -->
+    <button class="home-button" id="homeButton" title="Hauptmenü">🏠</button>
+
+    <!-- Modals -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Neuer Kunde</div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="gateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Tor speichern</div>
+            <div id="gateModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Main App Script -->
+    <script type="module" src="./tt-app/js/app.js"></script>
+</body>
+</html>

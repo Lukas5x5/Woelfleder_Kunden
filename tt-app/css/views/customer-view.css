@@ -1,0 +1,35 @@
+/* Customer View Specific Styles */
+.customer-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.customer-search {
+    flex: 1;
+    min-width: 250px;
+}
+
+.customer-search input {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+}
+
+.customer-search input:focus {
+    outline: none;
+    border-color: var(--red-primary);
+}
+
+@media (max-width: 768px) {
+    .customer-actions {
+        flex-direction: column;
+    }
+
+    .customer-search {
+        width: 100%;
+    }
+}

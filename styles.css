@@ -5,26 +5,67 @@
 }
 
 :root {
-    --primary-color: #c41e3a;
-    --primary-hover: #a01729;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
+    /* Hauptfarben - Gleich wie TT-App */
+    --primary-color: #c8102e;
+    --primary-hover: #a00d25;
+    --primary-light: #e01e3a;
+    --primary-lightest: #ffebee;
+
+    /* Grautöne */
+    --gray-bg: #f5f7fa;
+    --gray-light: #e8ecef;
+    --gray-medium: #9ca3af;
+    --gray-dark: #4b5563;
+
+    /* Textfarben */
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --text-secondary: #6b7280;
+
+    /* Statusfarben */
+    --success-color: #10b981;
+    --success: #10b981;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
-    --info-color: #17a2b8;
-    --light-bg: #f8f9fa;
-    --dark-text: #212529;
-    --border-color: #dee2e6;
-    --shadow: 0 2px 8px rgba(0,0,0,0.1);
-    --shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
+    --info-color: #3b82f6;
+    --info: #3b82f6;
+
+    /* Hintergrund & Borders */
+    --light-bg: #f5f7fa;
+    --white: #ffffff;
+    --border-color: #d1d5db;
+    --border: #d1d5db;
+    --border-light: #e5e7eb;
+
+    /* Schatten */
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 16px rgba(200, 16, 46, 0.12);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 8px 16px rgba(200, 16, 46, 0.12), 0 4px 8px rgba(0,0,0,0.08);
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+
+    /* Transitions */
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+
+    /* Legacy compatibility */
+    --secondary-color: #6c757d;
+    --dark-text: #1f2937;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #fce4e4 0%, #fff5f5 100%);
-    color: var(--dark-text);
+    background: var(--gray-bg);
+    color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -1242,4 +1283,24 @@ body {
         font-size: 11px;
         padding: 6px 10px;
     }
+}
+
+/* Scrollbar Styling - Gleich wie TT-App */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
 }

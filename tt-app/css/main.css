@@ -1,0 +1,192 @@
+/* Progress Steps - Modernes Design */
+.progress-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xxl);
+    background: white;
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--red-primary), var(--red-light));
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--gray-light);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all var(--transition-normal);
+    position: relative;
+    min-height: 44px; /* Touch-Target */
+}
+
+.step::after {
+    content: '→';
+    margin-left: var(--spacing-md);
+    opacity: 0.3;
+}
+
+.step:last-child::after {
+    display: none;
+}
+
+.step.active {
+    background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+    color: white;
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+    transform: scale(1.05);
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: var(--radius-round);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.step.active .step-number {
+    background: rgba(255,255,255,0.25);
+    border-color: white;
+}
+
+/* Layout Grid */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--spacing-xl);
+}
+
+/* Highlight Animation */
+@keyframes highlight-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(200, 16, 46, 0);
+    }
+    25% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 10px rgba(200, 16, 46, 0.3);
+    }
+    50% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(200, 16, 46, 0);
+    }
+    75% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 10px rgba(200, 16, 46, 0.3);
+    }
+}
+
+/* Responsive - Optimiert für Mobile */
+@media (max-width: 1024px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 15px; /* Besser lesbar auf Mobile */
+    }
+
+    .container {
+        margin: var(--spacing-lg) auto;
+        padding: 0 var(--spacing-lg);
+    }
+
+    .progress-steps {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-lg);
+    }
+
+    .step {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 1rem 1.25rem;
+    }
+
+    .step::after {
+        content: '↓';
+        margin-left: auto;
+        margin-right: 0;
+    }
+
+    .step:last-child::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 var(--spacing-md);
+        margin: var(--spacing-md) auto;
+    }
+
+    .progress-steps {
+        padding: var(--spacing-md);
+        gap: 0.5rem;
+    }
+
+    .step {
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Zusätzliche Touch-Optimierungen für Mobile */
+@media (hover: none) and (pointer: coarse) {
+    /* Größere Touch-Targets auf Touch-Geräten */
+    .btn {
+        min-height: 52px;
+        padding: 1rem 1.75rem;
+    }
+
+    .customer-card,
+    .type-card,
+    .gate-card {
+        padding: var(--spacing-xl);
+    }
+
+    /* Keine Hover-Effekte auf Touch-Geräten */
+    .customer-card:hover,
+    .type-card:hover {
+        transform: none;
+    }
+
+    /* Aber Active-States beibehalten */
+    .customer-card:active,
+    .type-card:active {
+        transform: scale(0.98);
+    }
+}

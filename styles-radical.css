@@ -1,38 +1,63 @@
 /* ========================================
-   WÖLFLEDER KUNDEN-APP - RADICAL NEW DESIGN
-   Dark Mode First | Gradient Accents | Card-Based
+   WÖLFLEDER KUNDEN-APP - TT-APP DESIGN
+   Light Mode | Red Accent | Modern & Clean
    ======================================== */
 
 :root {
-    /* Dark Theme Colors */
-    --bg-primary: #0f1419;
-    --bg-secondary: #1a1f2e;
-    --bg-tertiary: #252d3d;
-    --bg-card: #1e2532;
+    /* Light Theme Colors - Gleich wie TT-App */
+    --bg-primary: #f5f7fa;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e8ecef;
+    --bg-card: #ffffff;
 
-    /* Vibrant Gradients - Purple/Blue Theme (NOT Red) */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    /* Red Gradients - TT-App Style */
+    --gradient-primary: linear-gradient(135deg, #c8102e 0%, #a00d25 100%);
+    --gradient-secondary: linear-gradient(135deg, #e01e3a 0%, #c8102e 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+
+    /* Primary Red Colors - Gleich wie TT-App */
+    --primary-color: #c8102e;
+    --primary-hover: #a00d25;
+    --primary-light: #e01e3a;
+    --primary-lightest: #ffebee;
 
     /* Accent Colors */
-    --accent-purple: #667eea;
-    --accent-pink: #f093fb;
-    --accent-blue: #4facfe;
-    --accent-cyan: #00f2fe;
+    --accent-red: #c8102e;
+    --accent-red-dark: #a00d25;
+    --accent-red-light: #e01e3a;
 
     /* Text Colors */
-    --text-primary: #ffffff;
-    --text-secondary: #a0aec0;
-    --text-muted: #718096;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
 
     /* Status Colors */
-    --status-anfrage: #667eea;
-    --status-termin: #4facfe;
-    --status-angebot: #f5576c;
-    --status-auftrag: #00f2fe;
-    --status-abgeschlossen: #48bb78;
+    --status-anfrage: #3b82f6;
+    --status-termin: #8b5cf6;
+    --status-angebot: #f59e0b;
+    --status-auftrag: #10b981;
+    --status-abgeschlossen: #6b7280;
+    --success-color: #10b981;
+    --success: #10b981;
+    --info-color: #3b82f6;
+    --info: #3b82f6;
+    --warning-color: #f59e0b;
+    --danger-color: #dc3545;
+
+    /* Grautöne */
+    --gray-bg: #f5f7fa;
+    --gray-light: #e8ecef;
+    --gray-medium: #9ca3af;
+    --gray-dark: #4b5563;
+    --white: #ffffff;
+
+    /* Borders */
+    --border-color: #d1d5db;
+    --border: #d1d5db;
+    --border-light: #e5e7eb;
 
     /* Spacing */
     --space-xs: 4px;
@@ -43,23 +68,25 @@
     --space-2xl: 48px;
 
     /* Border Radius */
-    --radius-sm: 12px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
     --radius-full: 9999px;
 
-    /* Neumorphic Shadows */
-    --shadow-neumorphic:
-        12px 12px 24px rgba(0, 0, 0, 0.5),
-        -12px -12px 24px rgba(255, 255, 255, 0.03);
-    --shadow-neumorphic-inset:
-        inset 6px 6px 12px rgba(0, 0, 0, 0.4),
-        inset -6px -6px 12px rgba(255, 255, 255, 0.02);
-    --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.4);
+    /* Modern Shadows - TT-App Style */
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 16px rgba(200, 16, 46, 0.12);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 8px 16px rgba(200, 16, 46, 0.12), 0 4px 8px rgba(0,0,0,0.08);
+    --shadow-neumorphic: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-neumorphic-inset: inset 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-glow: 0 0 20px rgba(200, 16, 46, 0.2);
 
     /* Transitions */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
 }
 
 /* ========================================
@@ -78,27 +105,34 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     min-height: 100vh;
 }
 
-/* Hide scrollbar but keep functionality */
-body::-webkit-scrollbar {
+/* Scrollbar Styling - Gleich wie TT-App */
+::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
-body::-webkit-scrollbar-track {
-    background: var(--bg-primary);
+::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 3px;
 }
 
-body::-webkit-scrollbar-thumb {
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-full);
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
 }
 
 /* ========================================
@@ -123,7 +157,7 @@ body::-webkit-scrollbar-thumb {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(200, 16, 46, 0.08) 0%, transparent 70%);
     animation: pulse 8s ease-in-out infinite;
 }
 
@@ -138,9 +172,10 @@ body::-webkit-scrollbar-thumb {
     padding: var(--space-2xl);
     max-width: 420px;
     width: 100%;
-    box-shadow: var(--shadow-neumorphic);
+    box-shadow: var(--shadow-card);
     position: relative;
     z-index: 1;
+    border: 1px solid var(--border-light);
 }
 
 .login-header {
@@ -152,17 +187,14 @@ body::-webkit-scrollbar-thumb {
     width: 120px;
     height: auto;
     margin-bottom: var(--space-md);
-    filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3));
+    filter: drop-shadow(0 4px 12px rgba(200, 16, 46, 0.15));
 }
 
 .login-header h1 {
     font-size: 1.75rem;
     font-weight: 700;
     margin-bottom: var(--space-sm);
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary-color);
 }
 
 .login-header p {
@@ -286,13 +318,13 @@ body:not(.logged-out) .login-screen {
    ======================================== */
 
 .header {
-    background: var(--bg-card);
-    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    background: white;
+    border-bottom: 1px solid var(--border-light);
     padding: var(--space-md);
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow);
 }
 
 .header-container {
@@ -300,6 +332,8 @@ body:not(.logged-out) .login-screen {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .logo {
@@ -316,10 +350,7 @@ body:not(.logged-out) .login-screen {
 .logo h1 {
     font-size: 1.25rem;
     font-weight: 700;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary-color);
 }
 
 .header-actions {
@@ -334,17 +365,18 @@ body:not(.logged-out) .login-screen {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     border-radius: var(--radius-sm);
     font-size: 1.25rem;
     text-decoration: none;
     transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow);
 }
 
 .app-switcher-compact:hover {
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+    box-shadow: var(--shadow-hover);
 }
 
 .user-email {
@@ -373,32 +405,38 @@ body:not(.logged-out) .login-screen {
 }
 
 .btn-primary {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+    box-shadow: var(--shadow-hover);
 }
 
 .btn-secondary {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+    background: var(--gray-light);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    background: var(--bg-secondary);
+    background: var(--gray-medium);
+    color: white;
 }
 
 .btn-settings {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
 }
 
 .btn-settings:hover {
-    background: var(--bg-secondary);
+    background: var(--gray-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .btn span:last-child {
@@ -420,16 +458,19 @@ body:not(.logged-out) .login-screen {
 
 .filter-section {
     padding: var(--space-lg);
-    background: var(--bg-secondary);
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    margin-bottom: var(--space-lg);
 }
 
 .search-input {
     width: 100%;
     padding: var(--space-md);
-    background: var(--bg-card);
-    border: 2px solid transparent;
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
     font-size: 1rem;
     margin-bottom: var(--space-md);
     transition: var(--transition);
@@ -437,8 +478,8 @@ body:not(.logged-out) .login-screen {
 
 .search-input:focus {
     outline: none;
-    border-color: var(--accent-purple);
-    box-shadow: var(--shadow-glow);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1);
 }
 
 .search-input::placeholder {
@@ -458,15 +499,15 @@ body:not(.logged-out) .login-screen {
 }
 
 .filter-buttons::-webkit-scrollbar-thumb {
-    background: var(--bg-tertiary);
+    background: var(--primary-color);
     border-radius: var(--radius-full);
 }
 
 .filter-btn {
     padding: var(--space-sm) var(--space-md);
-    background: var(--bg-card);
+    background: var(--gray-light);
     color: var(--text-secondary);
-    border: 2px solid transparent;
+    border: 1px solid var(--border);
     border-radius: var(--radius-full);
     font-size: 0.9rem;
     font-weight: 600;
@@ -477,35 +518,40 @@ body:not(.logged-out) .login-screen {
 }
 
 .filter-btn.active {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
 }
 
 .filter-btn:hover:not(.active) {
-    border-color: var(--accent-purple);
+    background: var(--gray-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* ========================================
-   DASHBOARD STATS - GRADIENT CARDS
+   DASHBOARD STATS - KOMPAKTE KARTEN
    ======================================== */
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-md);
-    padding: var(--space-lg);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
 }
 
 .stat-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-xs);
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-neumorphic);
+    box-shadow: var(--shadow-card);
     transition: var(--transition);
+    border: 1px solid var(--border-light);
 }
 
 .stat-card::before {
@@ -515,52 +561,47 @@ body:not(.logged-out) .login-screen {
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
 }
 
 .stat-card:nth-child(2)::before {
-    background: var(--gradient-success);
+    background: var(--success-color);
 }
 
 .stat-card:nth-child(3)::before {
-    background: var(--gradient-secondary);
+    background: var(--info-color);
 }
 
 .stat-card:nth-child(4)::before {
-    background: var(--gradient-warning);
+    background: var(--warning-color);
 }
 
 .stat-card:nth-child(5)::before {
-    background: var(--gradient-primary);
+    background: var(--gray-dark);
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow:
-        12px 12px 24px rgba(0, 0, 0, 0.6),
-        -12px -12px 24px rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
 }
 
 .stat-icon {
-    font-size: 2rem;
-    margin-bottom: var(--space-sm);
-    filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.3));
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xs);
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: var(--space-xs);
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin-bottom: 2px;
+    color: var(--text-dark);
 }
 
 .stat-label {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 /* ========================================
@@ -588,14 +629,16 @@ body:not(.logged-out) .login-screen {
    ======================================== */
 
 .customer-card {
-    background: var(--bg-card);
+    background: white;
     border-radius: var(--radius-md);
     padding: var(--space-lg);
-    box-shadow: var(--shadow-neumorphic);
+    box-shadow: var(--shadow-card);
     transition: var(--transition);
     position: relative;
     overflow: hidden;
-    border-left: 4px solid var(--accent-purple);
+    border-left: 4px solid var(--primary-color);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--primary-color);
 }
 
 .customer-card::before {
@@ -605,16 +648,14 @@ body:not(.logged-out) .login-screen {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, transparent 100%);
+    background: linear-gradient(135deg, rgba(200, 16, 46, 0.02) 0%, transparent 100%);
     opacity: 0;
     transition: var(--transition);
 }
 
 .customer-card:hover {
-    transform: translateX(4px);
-    box-shadow:
-        16px 16px 32px rgba(0, 0, 0, 0.6),
-        -4px -4px 12px rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
 }
 
 .customer-card:hover::before {
@@ -668,28 +709,33 @@ body:not(.logged-out) .login-screen {
 }
 
 .status-anfrage {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(59, 130, 246, 0.1);
     color: var(--status-anfrage);
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .status-termin {
-    background: rgba(79, 172, 254, 0.2);
+    background: rgba(139, 92, 246, 0.1);
     color: var(--status-termin);
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .status-angebot {
-    background: rgba(245, 87, 108, 0.2);
+    background: rgba(245, 158, 11, 0.1);
     color: var(--status-angebot);
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .status-auftrag {
-    background: rgba(0, 242, 254, 0.2);
+    background: rgba(16, 185, 129, 0.1);
     color: var(--status-auftrag);
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .status-abgeschlossen {
-    background: rgba(72, 187, 120, 0.2);
+    background: rgba(107, 114, 128, 0.1);
     color: var(--status-abgeschlossen);
+    border: 1px solid rgba(107, 114, 128, 0.2);
 }
 
 .customer-info {
@@ -770,8 +816,8 @@ body:not(.logged-out) .login-screen {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     z-index: 200;
     padding: var(--space-lg);
     overflow-y: auto;
@@ -784,14 +830,15 @@ body:not(.logged-out) .login-screen {
 }
 
 .modal-content {
-    background: var(--bg-card);
+    background: white;
     border-radius: var(--radius-lg);
     max-width: 600px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
     position: relative;
+    border: 1px solid var(--border-light);
 }
 
 .modal-large {
@@ -800,28 +847,29 @@ body:not(.logged-out) .login-screen {
 
 .modal-header {
     padding: var(--space-xl);
-    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
-    background: var(--bg-card);
+    background: white;
     z-index: 1;
 }
 
 .modal-header h2 {
     font-size: 1.5rem;
     font-weight: 700;
+    color: var(--text-dark);
 }
 
 .close-btn {
     width: 36px;
     height: 36px;
-    background: var(--bg-tertiary);
+    background: var(--gray-light);
     border: none;
     border-radius: var(--radius-sm);
-    color: var(--text-primary);
+    color: var(--text-dark);
     font-size: 1.5rem;
     cursor: pointer;
     transition: var(--transition);
@@ -831,7 +879,8 @@ body:not(.logged-out) .login-screen {
 }
 
 .close-btn:hover {
-    background: var(--bg-secondary);
+    background: var(--primary-color);
+    color: white;
     transform: rotate(90deg);
 }
 
@@ -864,10 +913,10 @@ body:not(.logged-out) .login-screen {
 .form-group textarea {
     width: 100%;
     padding: var(--space-md);
-    background: var(--bg-secondary);
-    border: 2px solid transparent;
+    background: white;
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    color: var(--text-primary);
+    color: var(--text-dark);
     font-size: 1rem;
     font-family: inherit;
     transition: var(--transition);
@@ -877,8 +926,8 @@ body:not(.logged-out) .login-screen {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1);
 }
 
 .form-group textarea {
@@ -891,7 +940,7 @@ body:not(.logged-out) .login-screen {
     gap: var(--space-md);
     margin-top: var(--space-xl);
     padding-top: var(--space-xl);
-    border-top: 1px solid rgba(102, 126, 234, 0.2);
+    border-top: 1px solid var(--border-light);
 }
 
 .form-actions .btn {
@@ -901,7 +950,7 @@ body:not(.logged-out) .login-screen {
 
 .modal-footer {
     padding: var(--space-xl);
-    border-top: 1px solid rgba(102, 126, 234, 0.2);
+    border-top: 1px solid var(--border-light);
     display: flex;
     gap: var(--space-md);
     position: sticky;
@@ -1150,8 +1199,27 @@ body:not(.logged-out) .login-screen {
     }
 
     .stats {
-        grid-template-columns: repeat(2, 1fr);
-        padding: var(--space-md);
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        padding: var(--space-sm);
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+    }
+
+    .stat-icon {
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
     }
 
     .filter-section {

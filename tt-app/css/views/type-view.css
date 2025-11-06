@@ -1,0 +1,64 @@
+/* Type Select View Specific Styles */
+.current-customer-info {
+    background: var(--gray-bg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xl);
+    border-left: 4px solid var(--red-primary);
+}
+
+.current-customer-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-xs);
+}
+
+.current-customer-details {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+}
+
+.saved-gates-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.gate-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.icon-btn {
+    padding: var(--spacing-xs);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: var(--gray-light);
+    transform: scale(1.05);
+}
+
+.icon-btn.edit:hover {
+    color: var(--red-primary);
+    border-color: var(--red-primary);
+}
+
+.icon-btn.delete:hover {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    .current-customer-info {
+        padding: var(--spacing-md);
+    }
+}

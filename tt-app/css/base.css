@@ -1,0 +1,72 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--gray-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: var(--spacing-xl) auto;
+    padding: 0 var(--spacing-xl);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-dark);
+}
+
+.empty-icon {
+    font-size: var(--spacing-xxl);
+    opacity: 0.3;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--red-primary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--red-dark);
+}
+
+/* Selection */
+::selection {
+    background: var(--red-primary);
+    color: white;
+}
+
+/* Focus Styles */
+*:focus-visible {
+    outline: 2px solid var(--red-primary);
+    outline-offset: 2px;
+}
+
+/* Disable tap highlight */
+* {
+    -webkit-tap-highlight-color: transparent;
+}

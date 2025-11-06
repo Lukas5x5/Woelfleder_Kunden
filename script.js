@@ -8,11 +8,16 @@ let appSettings = {
 };
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     loadSettings();
     loadCustomTypes();
-    loadCustomers();
-    renderCustomers();
+
+    // Note: Customer loading is now handled by supabase-auth.js after authentication
+    // which calls initSupabaseSync() from supabase-sync.js
+    // Don't call loadCustomers() here - it will be called by initSupabaseSync()
+    // or by syncFromCloud() if using the legacy sync system
+
+    renderCustomers(); // Will show empty initially, then update when data loads
     updateStats();
     setupEventListeners();
     checkUpcomingAppointments();
@@ -57,13 +62,19 @@ function loadCustomers() {
 }
 
 // Save Customers to LocalStorage and Cloud
-function saveCustomers() {
+async function saveCustomers() {
     localStorage.setItem('woelfeder_customers', JSON.stringify(customers));
     updateStats();
 
-    // Sync to cloud if available
-    if (typeof syncToCloud === 'function') {
-        syncToCloud();
+    // Sync to cloud using new sync system
+    if (typeof saveCustomerToSupabase === 'function' && customers.length > 0) {
+        // Save the last customer (newest one) to Supabase
+        const lastCustomer = customers[customers.length - 1];
+        console.log('💾 Saving customer to Supabase:', lastCustomer.name);
+        await saveCustomerToSupabase(lastCustomer);
+    } else if (typeof syncToCloud === 'function') {
+        // Fallback to old sync system
+        await syncToCloud();
     }
 }
 
@@ -262,29 +273,31 @@ function deletePhoto(index) {
 }
 
 // Delete Customer
-function deleteCustomer(id) {
+async function deleteCustomer(id) {
     if (confirm('Möchten Sie diesen Kunden wirklich löschen?')) {
         // Delete from cloud first
-        if (typeof deleteCustomerFromCloud === 'function') {
-            deleteCustomerFromCloud(id);
+        if (typeof deleteCustomerFromSupabase === 'function') {
+            await deleteCustomerFromSupabase(id);
         }
 
         customers = customers.filter(c => c.id !== id);
-        saveCustomers();
+        await saveCustomers();
         renderCustomers();
     }
 }
 
 // Handle Form Submit
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     const formData = {
         id: document.getElementById('customerId').value || generateId(),
         name: document.getElementById('customerName').value,
+        company: document.getElementById('customerCompany')?.value || '',
         phone: document.getElementById('customerPhone').value,
         email: document.getElementById('customerEmail').value,
         address: document.getElementById('customerAddress').value,
+        city: document.getElementById('customerCity')?.value || '',
         source: document.getElementById('customerSource').value,
         type: document.getElementById('customerType').value,
         status: document.getElementById('customerStatus').value,
@@ -311,8 +324,17 @@ function handleFormSubmit(e) {
         customers.push(formData);
     }
 
-    saveCustomers();
+    // Save to localStorage
+    localStorage.setItem('woelfeder_customers', JSON.stringify(customers));
+
+    // Save this specific customer to Supabase
+    if (typeof saveCustomerToSupabase === 'function') {
+        console.log('💾 Saving customer to Supabase:', formData.name);
+        await saveCustomerToSupabase(formData);
+    }
+
     renderCustomers();
+    updateStats();
     closeModal();
 }
 
@@ -456,8 +478,14 @@ function showCustomerDetails(id) {
         ` : ''}
 
         <div class="details-section">
-            <h3>Tore & Türen <span id="gatesLoadingIndicator"></span></h3>
-            <div id="gatesListContainer">
+            <div class="collapsible-header" onclick="toggleGatesSection()" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white; font-weight: 600;">
+                    <span id="gatesToggleIcon">▼</span>
+                    Tore & Türen
+                    <span id="gatesLoadingIndicator"></span>
+                </h3>
+            </div>
+            <div id="gatesListContainer" style="display: none;">
                 <div class="empty-state">Lade Tore/Türen...</div>
             </div>
         </div>
@@ -906,7 +934,12 @@ async function loadAndDisplayGates(customerId) {
     try {
         const gates = await loadGatesForCustomer(customerId);
 
-        indicator.innerHTML = '';
+        // Update indicator with count
+        if (gates.length > 0) {
+            indicator.innerHTML = `<span style="font-size: 0.9rem; color: var(--text-secondary); background: var(--primary-color); color: white; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600;">${gates.length}</span>`;
+        } else {
+            indicator.innerHTML = '';
+        }
 
         if (gates.length === 0) {
             container.innerHTML = '<div class="empty-state">Noch keine Tore/Türen erstellt</div>';
@@ -915,19 +948,40 @@ async function loadAndDisplayGates(customerId) {
 
         container.innerHTML = `
             <div class="gates-list">
-                ${gates.map(gate => `
-                    <div class="gate-item" onclick="showGateDetails('${gate.id}')">
+                ${gates.map(gate => {
+                    const config = gate.config || {};
+                    return `
+                    <div class="gate-item" onclick="showGateDetails('${gate.id}')" style="cursor: pointer;">
                         <div class="gate-icon">🚪</div>
                         <div class="gate-info">
-                            <div class="gate-name">${escapeHtml(gate.name || gate.type || 'Tor/Tür')}</div>
-                            <div class="gate-details-mini">
-                                ${gate.width && gate.height ? `${gate.width}m × ${gate.height}m` : 'Keine Maße'}
-                                ${gate.price ? ` • ${formatCurrency(gate.price)}` : ''}
+                            <div class="gate-name" style="font-weight: 600; font-size: 1rem; color: var(--text-color); margin-bottom: 0.25rem;">
+                                ${escapeHtml(gate.name || gate.type || 'Unbenannt')}
+                            </div>
+                            ${gate.name ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${escapeHtml(gate.type)}</div>` : ''}
+                            <div class="gate-details-mini" style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.9rem; color: var(--text-secondary);">
+                                ${gate.width && gate.height ? `
+                                    <span style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <span style="font-weight: 500;">📏</span>
+                                        <span>${gate.width}m × ${gate.height}m</span>
+                                    </span>
+                                ` : ''}
+                                ${config.gesamtflaeche ? `
+                                    <span style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <span style="font-weight: 500;">⬜</span>
+                                        <span>${config.gesamtflaeche.toFixed(2)} m²</span>
+                                    </span>
+                                ` : ''}
+                                ${gate.price ? `
+                                    <span style="display: flex; align-items: center; gap: 0.25rem; color: var(--primary-color); font-weight: 600;">
+                                        <span>💶</span>
+                                        <span>${formatCurrency(gate.price)}</span>
+                                    </span>
+                                ` : ''}
                             </div>
                         </div>
-                        <div class="gate-arrow">→</div>
+                        <div class="gate-arrow" style="font-size: 1.5rem; color: var(--primary-color);">→</div>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
         `;
     } catch (error) {
@@ -951,121 +1005,100 @@ async function showGateDetails(gateId) {
 
         const modalContent = `
             <div class="gate-details-modal">
-                <h2>🚪 ${escapeHtml(gate.name || gate.type || 'Tor/Tür')}</h2>
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span>🚪</span>
+                    <span>${escapeHtml(gate.name || gate.type || 'Unbenannt')}</span>
+                </h2>
+                ${gate.name ? `<div style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">Typ: ${escapeHtml(gate.type)}</div>` : ''}
 
+                <!-- Preise - OBEN angezeigt -->
+                ${gate.price ? `
+                    <div class="details-section" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Gesamtpreis inkl. MwSt.</div>
+                                <div style="font-size: 2rem; font-weight: 700;">${formatCurrency(gate.price)}</div>
+                            </div>
+                            ${config.exklusiveMwst ? `
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.85rem; opacity: 0.9;">Netto</div>
+                                    <div style="font-size: 1.2rem; font-weight: 600;">${formatCurrency(config.exklusiveMwst)}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ${config.subtotal && config.aufschlag ? `
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3); display: flex; gap: 1.5rem; font-size: 0.9rem; opacity: 0.95;">
+                                <span>Zwischensumme: ${formatCurrency(config.subtotal)}</span>
+                                <span>Aufschlag: ${config.aufschlag}% (+${formatCurrency(config.aufschlagBetrag || 0)})</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                <!-- Abmessungen und Flächen -->
                 <div class="details-section">
-                    <h3>Abmessungen</h3>
-                    <div class="details-grid">
+                    <h3>📏 Abmessungen & Flächen</h3>
+                    <div class="details-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                         <div class="detail-item">
                             <div class="detail-label">Breite</div>
-                            <div class="detail-value">${gate.width || '-'} m</div>
+                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${gate.width || '-'} m</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Höhe</div>
-                            <div class="detail-value">${gate.height || '-'} m</div>
+                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${gate.height || '-'} m</div>
                         </div>
                         ${config.glashoehe ? `
                             <div class="detail-item">
                                 <div class="detail-label">Glashöhe</div>
-                                <div class="detail-value">${config.glashoehe} m</div>
+                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${(config.glashoehe / 100).toFixed(2)} m</div>
+                            </div>
+                        ` : ''}
+                        ${config.gesamtflaeche ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Gesamtfläche</div>
+                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${config.gesamtflaeche.toFixed(2)} m²</div>
+                            </div>
+                        ` : ''}
+                        ${config.glasflaeche ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Glasfläche</div>
+                                <div class="detail-value">${config.glasflaeche.toFixed(2)} m²</div>
+                            </div>
+                        ` : ''}
+                        ${config.torflaeche ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Torfläche (ohne Glas)</div>
+                                <div class="detail-value">${config.torflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                     </div>
                 </div>
 
-                ${config.gesamtflaeche || config.glasflaeche || config.torflaeche ? `
-                    <div class="details-section">
-                        <h3>Flächen</h3>
-                        <div class="details-grid">
-                            ${config.gesamtflaeche ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Gesamtfläche</div>
-                                    <div class="detail-value">${config.gesamtflaeche.toFixed(2)} m²</div>
-                                </div>
-                            ` : ''}
-                            ${config.glasflaeche ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Glasfläche</div>
-                                    <div class="detail-value">${config.glasflaeche.toFixed(2)} m²</div>
-                                </div>
-                            ` : ''}
-                            ${config.torflaeche ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Torfläche</div>
-                                    <div class="detail-value">${config.torflaeche.toFixed(2)} m²</div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                ` : ''}
-
-                ${config.selectedProducts && config.selectedProducts.length > 0 ? `
-                    <div class="details-section">
-                        <h3>Produkte (${config.selectedProducts.length})</h3>
-                        <div class="products-list">
-                            ${config.selectedProducts.map(product => `
-                                <div class="product-item">
-                                    <div class="product-name">${escapeHtml(product.name || product.title || 'Produkt')}</div>
-                                    <div class="product-details">
-                                        ${product.quantity ? `Menge: ${product.quantity}` : ''}
-                                        ${product.sides ? ` • ${product.sides}` : ''}
-                                        ${product.total ? ` • ${formatCurrency(product.total)}` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-
-                ${config.subtotal || config.aufschlag || gate.price ? `
-                    <div class="details-section">
-                        <h3>Preise</h3>
-                        <div class="details-grid">
-                            ${config.subtotal ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Zwischensumme</div>
-                                    <div class="detail-value">${formatCurrency(config.subtotal)}</div>
-                                </div>
-                            ` : ''}
-                            ${config.aufschlag ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Aufschlag</div>
-                                    <div class="detail-value">${config.aufschlag}%</div>
-                                </div>
-                            ` : ''}
-                            ${config.exklusiveMwst ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Exkl. MwSt</div>
-                                    <div class="detail-value">${formatCurrency(config.exklusiveMwst)}</div>
-                                </div>
-                            ` : ''}
-                            ${gate.price ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Gesamt inkl. MwSt</div>
-                                    <div class="detail-value" style="font-weight: 600; color: var(--primary-color);">${formatCurrency(gate.price)}</div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                ` : ''}
-
+                <!-- Ausgewählte Produkte -->
                 ${gate.notes ? `
                     <div class="details-section">
-                        <h3>Notizen</h3>
-                        <div class="detail-item">
-                            <div class="detail-value">${escapeHtml(gate.notes).replace(/\n/g, '<br>')}</div>
+                        <h3>📦 Ausgewählte Produkte</h3>
+                        <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--primary-color); color: #333;">
+                            <pre style="white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; line-height: 1.8; font-size: 0.95rem; color: #333;">${escapeHtml(gate.notes)}</pre>
                         </div>
                     </div>
                 ` : ''}
 
-                <div class="details-section">
-                    <div class="detail-item">
-                        <div class="detail-label">Erstellt am</div>
-                        <div class="detail-value">${new Date(gate.created_at || gate.createdAt).toLocaleString('de-DE')}</div>
+                <!-- Erstellungsdatum -->
+                <div class="details-section" style="border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <span>📅</span>
+                        <span>Erstellt am: ${new Date(gate.created_at || gate.createdAt).toLocaleString('de-DE', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</span>
                     </div>
                 </div>
 
-                <div class="modal-actions">
+                <div class="modal-actions" style="margin-top: 1.5rem;">
                     <button class="btn btn-secondary" onclick="closeGateDetailsModal()">Schließen</button>
                 </div>
             </div>
@@ -1078,8 +1111,8 @@ async function showGateDetails(gateId) {
             gateModal.id = 'gateDetailsModal';
             gateModal.className = 'modal';
             gateModal.innerHTML = `
-                <div class="modal-content">
-                    <div id="gateDetailsContent"></div>
+                <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 0;">
+                    <div id="gateDetailsContent" style="padding: 2rem;"></div>
                 </div>
             `;
             document.body.appendChild(gateModal);
@@ -1099,6 +1132,20 @@ function closeGateDetailsModal() {
     const modal = document.getElementById('gateDetailsModal');
     if (modal) {
         modal.classList.remove('active');
+    }
+}
+
+// Toggle gates section
+function toggleGatesSection() {
+    const container = document.getElementById('gatesListContainer');
+    const icon = document.getElementById('gatesToggleIcon');
+
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        icon.textContent = '▲';
+    } else {
+        container.style.display = 'none';
+        icon.textContent = '▼';
     }
 }
 

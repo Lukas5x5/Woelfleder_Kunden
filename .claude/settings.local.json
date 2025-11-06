@@ -10,7 +10,12 @@
       "Bash(git rm:*)",
       "Bash(git reset:*)",
       "Bash(script.js)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(python -m http.server:*)",
+      "Bash(git restore:*)",
+      "Bash(git log:*)",
+      "Bash(timeout 3 cmd:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

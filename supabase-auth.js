@@ -27,6 +27,12 @@ function initSupabase() {
             }
         });
         console.log('✅ Supabase initialisiert');
+
+        // Dispatch event immediately so TT-App can start loading
+        window.dispatchEvent(new CustomEvent('supabase-client-ready', {
+            detail: { client: supabaseClient }
+        }));
+
         return true;
     } catch (error) {
         console.error('❌ Supabase Fehler:', error);
@@ -46,15 +52,37 @@ async function checkAuth() {
 
         if (session) {
             currentUser = session.user;
+
+            // Dispatch event that user is authenticated (for TT-App)
+            window.dispatchEvent(new CustomEvent('supabase-user-ready', {
+                detail: { user: currentUser }
+            }));
+
             hideLoginScreen();
             displayUserEmail(currentUser.email);
-            await syncFromCloud();
+
+            // Use new sync system from supabase-sync.js
+            if (typeof initSupabaseSync === 'function') {
+                await initSupabaseSync();
+            } else {
+                await syncFromCloud();
+            }
         } else {
             showLoginScreen();
+
+            // Dispatch event even if no user (TT-App should not wait forever)
+            window.dispatchEvent(new CustomEvent('supabase-user-ready', {
+                detail: { user: null }
+            }));
         }
     } catch (error) {
         console.error('Auth Fehler:', error);
         showLoginScreen();
+
+        // Dispatch event on error too
+        window.dispatchEvent(new CustomEvent('supabase-user-ready', {
+            detail: { user: null }
+        }));
     }
 }
 
@@ -78,10 +106,16 @@ async function handleLogin(event) {
         currentUser = data.user;
         showAuthMessage('✅ Erfolgreich angemeldet!', 'success');
 
-        setTimeout(() => {
+        setTimeout(async () => {
             hideLoginScreen();
             displayUserEmail(currentUser.email);
-            syncFromCloud();
+
+            // Use new sync system from supabase-sync.js
+            if (typeof initSupabaseSync === 'function') {
+                await initSupabaseSync();
+            } else {
+                syncFromCloud();
+            }
         }, 1000);
 
     } catch (error) {
@@ -142,13 +176,27 @@ async function handleLogout() {
 
 // UI Funktionen
 function showLoginScreen() {
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.querySelector('.container').style.display = 'none';
+    const loginScreen = document.getElementById('loginScreen');
+    const container = document.querySelector('.container');
+
+    if (loginScreen) {
+        loginScreen.style.display = 'flex';
+    }
+    if (container) {
+        container.style.display = 'none';
+    }
 }
 
 function hideLoginScreen() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.querySelector('.container').style.display = 'block';
+    const loginScreen = document.getElementById('loginScreen');
+    const container = document.querySelector('.container');
+
+    if (loginScreen) {
+        loginScreen.style.display = 'none';
+    }
+    if (container) {
+        container.style.display = 'block';
+    }
 }
 
 function showLoginForm() {
@@ -171,19 +219,22 @@ function showAuthMessage(message, type) {
 }
 
 function displayUserEmail(email) {
-    document.getElementById('userEmail').textContent = email;
+    const userEmailEl = document.getElementById('userEmail');
+    if (userEmailEl) {
+        userEmailEl.textContent = email;
+    }
 }
 
 // ============================================
 // CLOUD SYNC FUNKTIONEN
 // ============================================
 
-// Daten von Cloud laden
+// Daten von Cloud laden (LEGACY - kept for backwards compatibility)
 async function syncFromCloud() {
     if (!supabaseClient || !currentUser) return;
 
     try {
-        // Kunden laden
+        // Kunden laden - using simplified table structure
         const { data: customersData, error: customersError } = await supabaseClient
             .from('customers')
             .select('*')
@@ -192,65 +243,53 @@ async function syncFromCloud() {
         if (customersError) throw customersError;
 
         if (customersData && customersData.length > 0) {
-            // Konvertiere Supabase Format zu lokalem Format
-            customers = customersData.map(c => ({
-                id: c.id,
-                name: c.name,
-                phone: c.phone,
-                email: c.email,
-                address: c.address,
-                source: c.source,
-                type: c.type,
-                status: c.status,
-                appointment: c.appointment,
-                sageRef: c.sage_ref,
-                followUpDate: c.follow_up_date,
-                notes: c.notes,
-                photos: c.photos || [],
-                documents: c.documents || [],
-                createdAt: c.created_at
+            // Konvertiere Supabase Format zu lokalem Format (complete)
+            customers = await Promise.all(customersData.map(async (c) => {
+                // Load gates for this customer
+                const gates = await loadGatesForCustomerKundenApp(c.id);
+
+                return {
+                    id: c.id,
+                    name: c.name,
+                    company: c.company || '',
+                    phone: c.phone || '',
+                    email: c.email || '',
+                    address: c.address || '',
+                    city: c.city || '',
+                    source: c.source || '',
+                    type: c.type || 'standard',
+                    status: c.status || 'active',
+                    appointment: c.appointment || '',
+                    sageRef: c.sage_ref || '',
+                    followUpDate: c.follow_up_date || '',
+                    notes: c.notes || '',
+                    photos: [],
+                    documents: [],
+                    appointments: [],
+                    gates: gates,
+                    createdAt: c.created_at
+                };
             }));
 
             localStorage.setItem('woelfeder_customers', JSON.stringify(customers));
         }
 
-        // Custom Types laden
-        const { data: typesData, error: typesError } = await supabaseClient
-            .from('custom_types')
-            .select('*')
-            .eq('user_id', currentUser.id);
-
-        if (typesError) throw typesError;
-
-        if (typesData) {
-            customTypes = typesData;
-            localStorage.setItem('woelfeder_custom_types', JSON.stringify(customTypes));
-        }
-
-        // Settings laden
-        const { data: settingsData, error: settingsError } = await supabaseClient
-            .from('app_settings')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single();
-
-        if (settingsData) {
-            appSettings = {
-                logo: settingsData.logo
-            };
-            localStorage.setItem('woelfeder_settings', JSON.stringify(appSettings));
-        }
-
         console.log('✅ Daten von Cloud geladen');
-        renderCustomers();
-        updateStats();
+
+        // Re-render if functions are available
+        if (typeof renderCustomers === 'function') {
+            renderCustomers();
+        }
+        if (typeof updateStats === 'function') {
+            updateStats();
+        }
 
     } catch (error) {
         console.error('Sync Fehler:', error);
     }
 }
 
-// Daten in Cloud speichern
+// Daten in Cloud speichern (LEGACY - use supabase-sync.js functions instead)
 async function syncToCloud() {
     if (!supabaseClient || !currentUser) {
         // Offline-Modus: nur lokal speichern
@@ -258,24 +297,17 @@ async function syncToCloud() {
     }
 
     try {
-        // Alle Kunden syncen
+        // Alle Kunden syncen (simplified table structure)
         for (const customer of customers) {
             const dbCustomer = {
                 id: customer.id,
                 user_id: currentUser.id,
                 name: customer.name,
-                phone: customer.phone,
-                email: customer.email,
-                address: customer.address,
-                source: customer.source,
-                type: customer.type,
-                status: customer.status,
-                appointment: customer.appointment || null,
-                sage_ref: customer.sageRef,
-                follow_up_date: customer.followUpDate || null,
-                notes: customer.notes,
-                photos: customer.photos || [],
-                documents: customer.documents || [],
+                company: customer.company || null,
+                phone: customer.phone || null,
+                email: customer.email || null,
+                address: customer.address || null,
+                city: customer.city || null,
                 created_at: customer.createdAt,
                 updated_at: new Date().toISOString()
             };
@@ -370,8 +402,78 @@ async function deleteCustomerFromCloud(customerId) {
 // TORE/TÜREN FUNKTIONEN
 // ============================================
 
-// Tore für einen Kunden laden
+// Tore für einen Kunden laden (konvertiert für Kunden-App Format)
 async function loadGatesForCustomer(customerId) {
+    if (!supabaseClient) {
+        return [];
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('gates')
+            .select('*')
+            .eq('customer_id', customerId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Convert from TT-App format to Kunden-App format
+        const gates = (data || []).map(gate => {
+            // Parse selected products if needed
+            let selectedProducts = [];
+            try {
+                selectedProducts = JSON.parse(gate.selected_products || '[]');
+            } catch (e) {
+                console.error('Error parsing selected_products:', e);
+            }
+
+            return {
+                id: gate.id,
+                customer_id: gate.customer_id,
+                name: gate.name || (gate.notizen ? gate.notizen.split('\n')[0] : (gate.gate_type || 'Tor')),
+                type: gate.gate_type || 'Tor',
+
+                // Convert dimensions from cm to m
+                width: gate.breite ? (gate.breite / 100).toFixed(2) : null,
+                height: gate.hoehe ? (gate.hoehe / 100).toFixed(2) : null,
+
+                // Use final price including VAT
+                price: gate.inkl_mwst || 0,
+
+                // Store full notes
+                notes: gate.notizen || '',
+
+                // Store all data for detailed view
+                config: {
+                    breite: gate.breite,
+                    hoehe: gate.hoehe,
+                    glashoehe: gate.glashoehe,
+                    gesamtflaeche: gate.gesamtflaeche,
+                    glasflaeche: gate.glasflaeche,
+                    torflaeche: gate.torflaeche,
+                    selectedProducts: selectedProducts,
+                    aufschlag: gate.aufschlag,
+                    subtotal: gate.subtotal,
+                    aufschlagBetrag: gate.aufschlag_betrag,
+                    exklusiveMwst: gate.exklusive_mwst,
+                    inklMwst: gate.inkl_mwst,
+                    quantity: gate.quantity
+                },
+
+                created_at: gate.created_at,
+                createdAt: gate.created_at
+            };
+        });
+
+        return gates;
+    } catch (error) {
+        console.error('Error loading gates:', error);
+        return [];
+    }
+}
+
+// Tore für einen Kunden laden (für Kunden-App mit Feldkonvertierung)
+async function loadGatesForCustomerKundenApp(customerId) {
     if (!supabaseClient || !currentUser) {
         return [];
     }
@@ -381,18 +483,67 @@ async function loadGatesForCustomer(customerId) {
             .from('gates')
             .select('*')
             .eq('customer_id', customerId)
-            .eq('user_id', currentUser.id)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+
+        // Konvertiere von TT-App Format (breite, hoehe, inklMwst, notizen)
+        // zu Kunden-App Format (width, height, price, notes)
+        const gates = (data || []).map(gate => {
+            // Parse selected products if needed
+            let selectedProducts = [];
+            try {
+                selectedProducts = JSON.parse(gate.selected_products || '[]');
+            } catch (e) {
+                console.error('Error parsing selected_products:', e);
+            }
+
+            return {
+                id: gate.id,
+                customer_id: gate.customer_id,
+                name: gate.name || (gate.notizen ? gate.notizen.split('\n')[0] : (gate.gate_type || 'Tor')),
+                type: gate.gate_type || 'Tor',
+
+                // Convert dimensions from cm to m
+                width: gate.breite ? (gate.breite / 100).toFixed(2) : null,
+                height: gate.hoehe ? (gate.hoehe / 100).toFixed(2) : null,
+
+                // Use final price including VAT
+                price: gate.inkl_mwst || 0,
+
+                // Store full notes
+                notes: gate.notizen || '',
+
+                // Store all data for detailed view
+                config: {
+                    breite: gate.breite,
+                    hoehe: gate.hoehe,
+                    glashoehe: gate.glashoehe,
+                    gesamtflaeche: gate.gesamtflaeche,
+                    glasflaeche: gate.glasflaeche,
+                    torflaeche: gate.torflaeche,
+                    selectedProducts: selectedProducts,
+                    aufschlag: gate.aufschlag,
+                    subtotal: gate.subtotal,
+                    aufschlagBetrag: gate.aufschlag_betrag,
+                    exklusiveMwst: gate.exklusive_mwst,
+                    inklMwst: gate.inkl_mwst,
+                    quantity: gate.quantity
+                },
+
+                created_at: gate.created_at,
+                createdAt: gate.created_at
+            };
+        });
+
+        return gates;
     } catch (error) {
-        console.error('Error loading gates:', error);
+        console.error('Error loading gates for Kunden-App:', error);
         return [];
     }
 }
 
-// Tor-Details laden
+// Tor-Details laden (für Kunden-App)
 async function loadGateDetails(gateId) {
     if (!supabaseClient || !currentUser) {
         return null;
@@ -403,11 +554,57 @@ async function loadGateDetails(gateId) {
             .from('gates')
             .select('*')
             .eq('id', gateId)
-            .eq('user_id', currentUser.id)
             .single();
 
         if (error) throw error;
-        return data;
+
+        // Convert from TT-App format to Kunden-App format
+        const gate = data;
+
+        // Parse selected products if needed
+        let selectedProducts = [];
+        try {
+            selectedProducts = JSON.parse(gate.selected_products || '[]');
+        } catch (e) {
+            console.error('Error parsing selected_products:', e);
+        }
+
+        return {
+            id: gate.id,
+            customer_id: gate.customer_id,
+            name: gate.name || (gate.notizen ? gate.notizen.split('\n')[0] : (gate.gate_type || 'Tor')),
+            type: gate.gate_type || 'Tor',
+
+            // Convert dimensions from cm to m
+            width: gate.breite ? (gate.breite / 100).toFixed(2) : null,
+            height: gate.hoehe ? (gate.hoehe / 100).toFixed(2) : null,
+
+            // Use final price including VAT
+            price: gate.inkl_mwst || 0,
+
+            // Store full notes
+            notes: gate.notizen || '',
+
+            // Store all data for detailed view
+            config: {
+                breite: gate.breite,
+                hoehe: gate.hoehe,
+                glashoehe: gate.glashoehe,
+                gesamtflaeche: gate.gesamtflaeche,
+                glasflaeche: gate.glasflaeche,
+                torflaeche: gate.torflaeche,
+                selectedProducts: selectedProducts,
+                aufschlag: gate.aufschlag,
+                subtotal: gate.subtotal,
+                aufschlagBetrag: gate.aufschlag_betrag,
+                exklusiveMwst: gate.exklusive_mwst,
+                inklMwst: gate.inkl_mwst,
+                quantity: gate.quantity
+            },
+
+            created_at: gate.created_at,
+            createdAt: gate.created_at
+        };
     } catch (error) {
         console.error('Error loading gate details:', error);
         return null;
@@ -415,14 +612,19 @@ async function loadGateDetails(gateId) {
 }
 
 // App initialisieren
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const isSupabaseConfigured = initSupabase();
 
     if (isSupabaseConfigured) {
-        checkAuth();
+        await checkAuth();
     } else {
         // Offline-Modus
         console.log('📱 App läuft im Offline-Modus');
         hideLoginScreen();
+
+        // Dispatch event even in offline mode
+        window.dispatchEvent(new CustomEvent('supabase-user-ready', {
+            detail: { user: null }
+        }));
     }
 });
