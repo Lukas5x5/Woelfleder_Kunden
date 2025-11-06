@@ -318,20 +318,22 @@ body:not(.logged-out) .login-screen {
    ======================================== */
 
 .header {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-light);
-    padding: var(--space-md);
+    padding: 12px 16px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: var(--shadow);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .header-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-md);
+    gap: 12px;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -339,117 +341,182 @@ body:not(.logged-out) .login-screen {
 .logo {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .logo-img {
-    height: 48px;
+    height: 40px;
     width: auto;
 }
 
 .logo h1 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--primary-color);
+    display: none; /* Mobile: Versteckt */
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .app-switcher-compact {
-    width: 42px;
-    height: 42px;
+    min-width: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary-color);
-    border-radius: var(--radius-sm);
-    font-size: 1.25rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    border-radius: 12px;
+    font-size: 1.3rem;
     text-decoration: none;
-    transition: var(--transition);
-    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.25);
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-switcher-compact::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.app-switcher-compact:active::before {
+    width: 100px;
+    height: 100px;
 }
 
 .app-switcher-compact:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 6px 20px rgba(200, 16, 46, 0.35);
+    transform: translateY(-1px);
+}
+
+.app-switcher-compact:active {
+    transform: translateY(0);
 }
 
 .user-email {
     display: none;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 /* ========================================
-   BUTTONS - GRADIENT & NEUMORPHIC
+   BUTTONS - MODERN & MOBILE-OPTIMIZED
    ======================================== */
 
 .btn {
-    padding: var(--space-sm) var(--space-md);
+    padding: 10px 16px;
     border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.95rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-sm);
+    gap: 6px;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px; /* iOS Touch Target */
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
     color: white;
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.25);
 }
 
 .btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 6px 20px rgba(200, 16, 46, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 .btn-secondary {
-    background: var(--gray-light);
+    background: rgba(255, 255, 255, 0.9);
     color: var(--text-dark);
     border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
+    background: var(--gray-light);
+    border-color: var(--gray-medium);
+}
+
+.btn-secondary:active {
     background: var(--gray-medium);
     color: white;
 }
 
 .btn-settings {
-    background: white;
-    color: var(--text-dark);
-    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    backdrop-filter: blur(10px);
 }
 
 .btn-settings:hover {
-    background: var(--gray-bg);
+    background: white;
     border-color: var(--primary-color);
     color: var(--primary-color);
 }
 
+.btn-settings:active {
+    background: var(--primary-lightest);
+}
+
+/* Mobile: Nur Icons zeigen */
 .btn span:last-child {
     display: none;
 }
 
 .btn span:first-child {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 .full-width {
     width: 100%;
-    padding: var(--space-md);
+    padding: 12px 16px;
 }
 
 /* ========================================
@@ -1172,7 +1239,7 @@ body:not(.logged-out) .login-screen {
 /* Mobile (default) */
 @media (max-width: 768px) {
     .header {
-        padding: var(--space-sm);
+        padding: 10px 12px;
     }
 
     .logo h1 {
@@ -1192,10 +1259,14 @@ body:not(.logged-out) .login-screen {
     }
 
     .btn {
-        width: 42px;
-        height: 42px;
+        min-width: 44px;
+        min-height: 44px;
         padding: 0;
-        min-width: 42px;
+        border-radius: 12px;
+    }
+
+    .btn span:first-child {
+        font-size: 1.3rem;
     }
 
     .stats {
@@ -1244,8 +1315,17 @@ body:not(.logged-out) .login-screen {
 
 /* Tablet */
 @media (min-width: 769px) {
+    .header {
+        padding: 14px 20px;
+    }
+
     .logo h1 {
         display: block;
+        font-size: 1.2rem;
+    }
+
+    .logo-img {
+        height: 44px;
     }
 
     .user-email {
@@ -1254,15 +1334,27 @@ body:not(.logged-out) .login-screen {
 
     .btn {
         width: auto;
-        padding: var(--space-sm) var(--space-md);
+        min-width: auto;
+        padding: 10px 18px;
     }
 
     .btn span:last-child {
         display: inline;
+        margin-left: 2px;
+    }
+
+    .btn span:first-child {
+        font-size: 1.1rem;
     }
 
     .stats {
         grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-sm);
+        padding: var(--space-md);
+    }
+
+    .stat-card {
+        padding: var(--space-md) var(--space-sm);
     }
 }
 

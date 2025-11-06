@@ -1036,39 +1036,39 @@ async function showGateDetails(gateId) {
                 ` : ''}
 
                 <!-- Abmessungen und Flächen -->
-                <div class="details-section">
-                    <h3>📏 Abmessungen & Flächen</h3>
-                    <div class="details-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-                        <div class="detail-item">
-                            <div class="detail-label">Breite</div>
-                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${gate.width || '-'} m</div>
+                <div class="details-section" style="margin-bottom: 1rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-dark);">📏 Abmessungen & Flächen</h3>
+                    <div class="details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem;">
+                        <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                            <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Breite</div>
+                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${gate.width || '-'} m</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Höhe</div>
-                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${gate.height || '-'} m</div>
+                        <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                            <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Höhe</div>
+                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${gate.height || '-'} m</div>
                         </div>
                         ${config.glashoehe ? `
-                            <div class="detail-item">
-                                <div class="detail-label">Glashöhe</div>
-                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600;">${(config.glashoehe / 100).toFixed(2)} m</div>
+                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Glashöhe</div>
+                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${(config.glashoehe / 100).toFixed(2)} m</div>
                             </div>
                         ` : ''}
                         ${config.gesamtflaeche ? `
-                            <div class="detail-item">
-                                <div class="detail-label">Gesamtfläche</div>
+                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Gesamtfläche</div>
                                 <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${config.gesamtflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                         ${config.glasflaeche ? `
-                            <div class="detail-item">
-                                <div class="detail-label">Glasfläche</div>
-                                <div class="detail-value">${config.glasflaeche.toFixed(2)} m²</div>
+                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Glasfläche</div>
+                                <div class="detail-value" style="font-size: 1rem; font-weight: 600; color: var(--text-dark);">${config.glasflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                         ${config.torflaeche ? `
-                            <div class="detail-item">
-                                <div class="detail-label">Torfläche (ohne Glas)</div>
-                                <div class="detail-value">${config.torflaeche.toFixed(2)} m²</div>
+                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Torfläche</div>
+                                <div class="detail-value" style="font-size: 1rem; font-weight: 600; color: var(--text-dark);">${config.torflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                     </div>
@@ -1111,8 +1111,8 @@ async function showGateDetails(gateId) {
             gateModal.id = 'gateDetailsModal';
             gateModal.className = 'modal';
             gateModal.innerHTML = `
-                <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 0;">
-                    <div id="gateDetailsContent" style="padding: 2rem;"></div>
+                <div class="modal-content" style="max-width: 800px; width: 95%; max-height: 95vh; overflow-y: auto; padding: 0; margin: auto;">
+                    <div id="gateDetailsContent" style="padding: 1rem;"></div>
                 </div>
             `;
             document.body.appendChild(gateModal);
