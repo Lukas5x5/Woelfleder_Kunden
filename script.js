@@ -49,8 +49,11 @@ function setupEventListeners() {
     // Document upload
     document.getElementById('customerDocuments').addEventListener('change', handleDocumentUpload);
 
-    // Logo upload
-    document.getElementById('logoUpload').addEventListener('change', handleLogoUpload);
+    // Logo upload - DISABLED: Logo is now fixed and cannot be changed
+    // const logoUploadElement = document.getElementById('logoUpload');
+    // if (logoUploadElement) {
+    //     logoUploadElement.addEventListener('change', handleLogoUpload);
+    // }
 }
 
 // Load Customers from LocalStorage
@@ -698,9 +701,15 @@ function loadSettings() {
     const stored = localStorage.getItem('woelfeder_settings');
     if (stored) {
         appSettings = JSON.parse(stored);
-        if (appSettings.logo) {
-            document.getElementById('logoImg').src = appSettings.logo;
-        }
+        // Logo is now fixed - always use logo.png regardless of stored settings
+        // if (appSettings.logo) {
+        //     document.getElementById('logoImg').src = appSettings.logo;
+        // }
+    }
+    // Always ensure logo is set to logo.png
+    const logoImg = document.getElementById('logoImg');
+    if (logoImg) {
+        logoImg.src = 'logo.png';
     }
 }
 
@@ -725,28 +734,28 @@ function closeSettingsModal() {
     document.getElementById('settingsModal').classList.remove('active');
 }
 
-// Handle Logo Upload
-function handleLogoUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            appSettings.logo = event.target.result;
-            document.getElementById('logoImg').src = event.target.result;
-            saveSettings();
-            alert('Logo erfolgreich hochgeladen!');
-        };
-        reader.readAsDataURL(file);
-    }
-}
+// Handle Logo Upload - DISABLED: Logo is now fixed
+// function handleLogoUpload(e) {
+//     const file = e.target.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = function(event) {
+//             appSettings.logo = event.target.result;
+//             document.getElementById('logoImg').src = event.target.result;
+//             saveSettings();
+//             alert('Logo erfolgreich hochgeladen!');
+//         };
+//         reader.readAsDataURL(file);
+//     }
+// }
 
-// Reset Logo
-function resetLogo() {
-    appSettings.logo = null;
-    document.getElementById('logoImg').src = 'logo.png';
-    saveSettings();
-    alert('Logo zurückgesetzt!');
-}
+// Reset Logo - DISABLED: Logo is now fixed
+// function resetLogo() {
+//     appSettings.logo = null;
+//     document.getElementById('logoImg').src = 'logo.png';
+//     saveSettings();
+//     alert('Logo zurückgesetzt!');
+// }
 
 // ========== CUSTOM TYPES FUNCTIONS ==========
 

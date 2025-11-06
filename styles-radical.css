@@ -1370,6 +1370,23 @@ body:not(.logged-out) .login-screen {
         bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
         right: var(--space-lg);
     }
+
+    /* Settings buttons should keep proper padding on mobile */
+    .settings-section .btn,
+    .backup-actions .btn,
+    .add-type-form .btn {
+        padding: var(--space-sm) var(--space-md) !important;
+        min-height: 44px;
+        width: auto;
+    }
+
+    .backup-actions {
+        flex-direction: column;
+    }
+
+    .backup-actions .btn {
+        width: 100%;
+    }
 }
 
 /* Tablet */
