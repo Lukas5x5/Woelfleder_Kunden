@@ -1004,30 +1004,30 @@ async function showGateDetails(gateId) {
         const config = gate.config || {};
 
         const modalContent = `
-            <div class="gate-details-modal">
-                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div class="gate-details-modal" style="color: #1f2937;">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: #1f2937;">
                     <span>🚪</span>
                     <span>${escapeHtml(gate.name || gate.type || 'Unbenannt')}</span>
                 </h2>
-                ${gate.name ? `<div style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">Typ: ${escapeHtml(gate.type)}</div>` : ''}
+                ${gate.name ? `<div style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Typ: ${escapeHtml(gate.type)}</div>` : ''}
 
                 <!-- Preise - OBEN angezeigt -->
                 ${gate.price ? `
-                    <div class="details-section" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <div style="background: linear-gradient(135deg, #c8102e 0%, #a00d25 100%); color: white; padding: 1.25rem; border-radius: 10px; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <div>
-                                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Gesamtpreis inkl. MwSt.</div>
-                                <div style="font-size: 2rem; font-weight: 700;">${formatCurrency(gate.price)}</div>
+                                <div style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 0.25rem;">Gesamtpreis inkl. MwSt.</div>
+                                <div style="font-size: 1.75rem; font-weight: 700;">${formatCurrency(gate.price)}</div>
                             </div>
                             ${config.exklusiveMwst ? `
                                 <div style="text-align: right;">
-                                    <div style="font-size: 0.85rem; opacity: 0.9;">Netto</div>
-                                    <div style="font-size: 1.2rem; font-weight: 600;">${formatCurrency(config.exklusiveMwst)}</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.9;">Netto</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600;">${formatCurrency(config.exklusiveMwst)}</div>
                                 </div>
                             ` : ''}
                         </div>
                         ${config.subtotal && config.aufschlag ? `
-                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3); display: flex; gap: 1.5rem; font-size: 0.9rem; opacity: 0.95;">
+                            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.3); display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; opacity: 0.95;">
                                 <span>Zwischensumme: ${formatCurrency(config.subtotal)}</span>
                                 <span>Aufschlag: ${config.aufschlag}% (+${formatCurrency(config.aufschlagBetrag || 0)})</span>
                             </div>
@@ -1036,39 +1036,39 @@ async function showGateDetails(gateId) {
                 ` : ''}
 
                 <!-- Abmessungen und Flächen -->
-                <div class="details-section" style="margin-bottom: 1rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-dark);">📏 Abmessungen & Flächen</h3>
-                    <div class="details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem;">
-                        <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                            <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Breite</div>
-                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${gate.width || '-'} m</div>
+                <div style="margin-bottom: 1rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #1f2937; font-weight: 600;">📏 Abmessungen & Flächen</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.65rem;">
+                        <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                            <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Breite</div>
+                            <div style="font-size: 1rem; font-weight: 600; color: #1f2937;">${gate.width || '-'} m</div>
                         </div>
-                        <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                            <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Höhe</div>
-                            <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${gate.height || '-'} m</div>
+                        <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                            <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Höhe</div>
+                            <div style="font-size: 1rem; font-weight: 600; color: #1f2937;">${gate.height || '-'} m</div>
                         </div>
                         ${config.glashoehe ? `
-                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Glashöhe</div>
-                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${(config.glashoehe / 100).toFixed(2)} m</div>
+                            <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                                <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Glashöhe</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #1f2937;">${(config.glashoehe / 100).toFixed(2)} m</div>
                             </div>
                         ` : ''}
                         ${config.gesamtflaeche ? `
-                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Gesamtfläche</div>
-                                <div class="detail-value" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${config.gesamtflaeche.toFixed(2)} m²</div>
+                            <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                                <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Gesamtfläche</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #c8102e;">${config.gesamtflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                         ${config.glasflaeche ? `
-                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Glasfläche</div>
-                                <div class="detail-value" style="font-size: 1rem; font-weight: 600; color: var(--text-dark);">${config.glasflaeche.toFixed(2)} m²</div>
+                            <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                                <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Glasfläche</div>
+                                <div style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">${config.glasflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                         ${config.torflaeche ? `
-                            <div class="detail-item" style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
-                                <div class="detail-label" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Torfläche</div>
-                                <div class="detail-value" style="font-size: 1rem; font-weight: 600; color: var(--text-dark);">${config.torflaeche.toFixed(2)} m²</div>
+                            <div style="background: #f8f9fa; padding: 0.65rem; border-radius: 8px;">
+                                <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.2rem;">Torfläche</div>
+                                <div style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">${config.torflaeche.toFixed(2)} m²</div>
                             </div>
                         ` : ''}
                     </div>
@@ -1076,17 +1076,17 @@ async function showGateDetails(gateId) {
 
                 <!-- Ausgewählte Produkte -->
                 ${gate.notes ? `
-                    <div class="details-section">
-                        <h3>📦 Ausgewählte Produkte</h3>
-                        <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--primary-color); color: #333;">
-                            <pre style="white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; line-height: 1.8; font-size: 0.95rem; color: #333;">${escapeHtml(gate.notes)}</pre>
+                    <div style="margin-bottom: 1rem;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #1f2937; font-weight: 600;">📦 Ausgewählte Produkte</h3>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #c8102e;">
+                            <pre style="white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; line-height: 1.6; font-size: 0.85rem; color: #1f2937;">${escapeHtml(gate.notes)}</pre>
                         </div>
                     </div>
                 ` : ''}
 
                 <!-- Erstellungsdatum -->
-                <div class="details-section" style="border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-top: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <div style="border-top: 1px solid #e5e7eb; padding-top: 0.75rem; margin-top: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.85rem;">
                         <span>📅</span>
                         <span>Erstellt am: ${new Date(gate.created_at || gate.createdAt).toLocaleString('de-DE', {
                             day: '2-digit',
@@ -1098,8 +1098,8 @@ async function showGateDetails(gateId) {
                     </div>
                 </div>
 
-                <div class="modal-actions" style="margin-top: 1.5rem;">
-                    <button class="btn btn-secondary" onclick="closeGateDetailsModal()">Schließen</button>
+                <div style="margin-top: 1.25rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="closeGateDetailsModal()" style="flex: 1;">Schließen</button>
                 </div>
             </div>
         `;
