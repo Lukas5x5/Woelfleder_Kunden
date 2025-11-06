@@ -216,6 +216,24 @@ function updateStats() {
         return followUpDate >= today;
     }).length;
     document.getElementById('statFollowUp').textContent = followUps;
+
+    // Update open orders count
+    updateOpenOrdersCount();
+}
+
+// Update open orders count in header
+async function updateOpenOrdersCount() {
+    if (typeof orderService === 'undefined' || !orderService) {
+        return;
+    }
+
+    try {
+        const allOrders = await orderService.getAllOrders();
+        const openOrders = allOrders.filter(order => order.status !== 'abgeschlossen');
+        document.getElementById('openOrdersCount').textContent = openOrders.length;
+    } catch (error) {
+        console.error('Error updating open orders count:', error);
+    }
 }
 
 // Show New Customer Modal
@@ -1255,6 +1273,8 @@ async function handleOrderSubmit(event) {
         closeOrderModal();
         // Refresh customer details
         showCustomerDetails(customerId);
+        // Update open orders count
+        updateOpenOrdersCount();
     } else {
         alert('Fehler beim Speichern des Auftrags');
     }
@@ -1285,6 +1305,8 @@ async function completeOrder(orderId) {
         if (order) {
             showCustomerDetails(order.customer_id);
         }
+        // Update open orders count
+        updateOpenOrdersCount();
     } else {
         alert('Fehler beim Abschließen des Auftrags');
     }
@@ -1425,3 +1447,133 @@ function showInstallInstructions() {
         alert('ℹ️ Diese Funktion ist nur auf iPhone/iPad verfügbar.\n\nAuf Android: Öffne das Menü (⋮) und wähle "Zum Startbildschirm hinzufügen"');
     }
 }
+
+// ============================================
+// OPEN ORDERS DROPDOWN
+// ============================================
+
+/**
+ * Toggle open orders dropdown
+ */
+function toggleOpenOrdersDropdown() {
+    const dropdown = document.getElementById('openOrdersDropdown');
+    dropdown.classList.toggle('show');
+
+    if (dropdown.classList.contains('show')) {
+        loadOpenOrders();
+    }
+}
+
+/**
+ * Load open orders (not completed)
+ */
+async function loadOpenOrders() {
+    if (typeof orderService === 'undefined' || !orderService) {
+        console.error('Order service not available');
+        return;
+    }
+
+    const openOrdersList = document.getElementById('openOrdersList');
+    openOrdersList.innerHTML = '<div style="padding: 1rem; text-align: center;">Laden...</div>';
+
+    try {
+        // Get all orders
+        const allOrders = await orderService.getAllOrders();
+
+        // Filter open orders (not abgeschlossen)
+        const openOrders = allOrders.filter(order => order.status !== 'abgeschlossen');
+
+        // Update count
+        document.getElementById('openOrdersCount').textContent = openOrders.length;
+
+        if (openOrders.length === 0) {
+            openOrdersList.innerHTML = '<div class="dropdown-empty">Keine offenen Aufträge</div>';
+            return;
+        }
+
+        // Load customer names for each order
+        const ordersWithCustomers = await Promise.all(
+            openOrders.map(async (order) => {
+                // Find customer by ID
+                let customerName = 'Unbekannt';
+
+                // Try to find in localStorage customers
+                const customer = customers.find(c => c.id === order.customer_id);
+                if (customer) {
+                    customerName = customer.name;
+                } else if (typeof loadCustomerById === 'function') {
+                    // Try to load from Supabase
+                    const loadedCustomer = await loadCustomerById(order.customer_id);
+                    if (loadedCustomer) {
+                        customerName = loadedCustomer.name;
+                    }
+                }
+
+                return {
+                    ...order,
+                    customerName
+                };
+            })
+        );
+
+        // Render open orders
+        openOrdersList.innerHTML = ordersWithCustomers.map(order => `
+            <div class="dropdown-order-item" onclick="openOrderFromDropdown('${order.id}')">
+                <div class="dropdown-order-number">${order.order_number}</div>
+                <div class="dropdown-order-customer">👤 ${order.customerName}</div>
+                <div class="dropdown-order-meta">
+                    <span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span>
+                    <span>🚪 ${order.gateCount || 0} Tor(e)</span>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Error loading open orders:', error);
+        openOrdersList.innerHTML = '<div class="dropdown-empty">Fehler beim Laden</div>';
+    }
+}
+
+/**
+ * Open order from dropdown
+ */
+async function openOrderFromDropdown(orderId) {
+    // Close dropdown
+    document.getElementById('openOrdersDropdown').classList.remove('show');
+
+    // Open order details
+    await showOrderDetails(orderId);
+}
+
+/**
+ * Load customer by ID (helper function)
+ */
+async function loadCustomerById(customerId) {
+    if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+        return null;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('customers')
+            .select('*')
+            .eq('id', customerId)
+            .single();
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error loading customer:', error);
+        return null;
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('openOrdersDropdown');
+    const button = document.getElementById('openOrdersBtn');
+
+    if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});

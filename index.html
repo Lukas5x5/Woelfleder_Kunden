@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wölfleder Außendienst Manager</title>
-    <link rel="stylesheet" href="styles-radical.css?v=3.2">
+    <link rel="stylesheet" href="styles-radical.css?v=3.3">
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -78,6 +78,17 @@
                     <a href="tore.html" class="app-switcher-compact" title="Zur Tore & Türen App">
                         🚪
                     </a>
+                    <div class="open-orders-dropdown">
+                        <button class="btn btn-info" onclick="toggleOpenOrdersDropdown()" id="openOrdersBtn">
+                            <span>📋</span><span>Offene Aufträge (<span id="openOrdersCount">0</span>)</span>
+                        </button>
+                        <div class="dropdown-content" id="openOrdersDropdown">
+                            <div class="dropdown-header">Offene Aufträge</div>
+                            <div id="openOrdersList" class="dropdown-list">
+                                <!-- Open orders will be populated here -->
+                            </div>
+                        </div>
+                    </div>
                     <span id="userEmail" class="user-email"></span>
                     <button class="btn btn-settings" onclick="showSettingsModal()">
                         <span>⚙️</span><span>Einstellungen</span>
@@ -175,57 +186,6 @@
                     <textarea id="customerAddress" rows="2"></textarea>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Quelle *</label>
-                        <select id="customerSource" required>
-                            <option value="">Bitte wählen</option>
-                            <option value="email">Email</option>
-                            <option value="telefon">Telefon</option>
-                            <option value="mundpropaganda">Mundpropaganda</option>
-                            <option value="firma">Firma direkt</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Auftragstyp *</label>
-                        <select id="customerType" required>
-                            <option value="">Bitte wählen</option>
-                            <option value="nur-angebot">Nur Angebot</option>
-                            <option value="ausmessen-tore">Ausmessen Tore</option>
-                            <option value="stall-zeichnen">Stall zeichnen + ausmessen</option>
-                            <option value="bestellung">Bestellung/Auftrag</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Status *</label>
-                        <select id="customerStatus" required>
-                            <option value="anfrage">Anfrage</option>
-                            <option value="termin">Termin vereinbart</option>
-                            <option value="angebot">Angebot erstellt</option>
-                            <option value="auftrag">Auftrag erteilt</option>
-                            <option value="abgeschlossen">Abgeschlossen</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Termin</label>
-                        <input type="datetime-local" id="customerAppointment">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Sage Angebotsnummer</label>
-                        <input type="text" id="customerSageRef">
-                    </div>
-                    <div class="form-group">
-                        <label>Wiedervorlage / Später kontaktieren</label>
-                        <input type="date" id="customerFollowUp">
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label>Notizen</label>
                     <textarea id="customerNotes" rows="3"></textarea>
@@ -235,12 +195,6 @@
                     <label>Fotos</label>
                     <input type="file" id="customerPhotos" accept="image/*" multiple>
                     <div id="photoPreview" class="photo-preview"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>Dokumente (Angebote, PDFs, etc.)</label>
-                    <input type="file" id="customerDocuments" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple>
-                    <div id="documentPreview" class="document-preview"></div>
                 </div>
 
                 <div class="form-actions">
@@ -364,6 +318,12 @@
                 <div class="form-group">
                     <label for="orderNotes">Notizen</label>
                     <textarea id="orderNotes" rows="4" placeholder="Auftragsnotizen..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Dokumente (Angebote, PDFs, etc.)</label>
+                    <input type="file" id="orderDocuments" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple>
+                    <div id="orderDocumentPreview" class="document-preview"></div>
                 </div>
 
                 <div class="form-actions">

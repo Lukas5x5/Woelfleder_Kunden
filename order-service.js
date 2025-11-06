@@ -298,6 +298,136 @@ class OrderService {
             return [];
         }
     }
+
+    /**
+     * Upload documents for an order
+     * @param {string} orderId
+     * @param {FileList} files
+     * @returns {Promise<Array>} Array of uploaded file URLs
+     */
+    async uploadOrderDocuments(orderId, files) {
+        if (!this.supabase || !this.currentUser) {
+            console.error('❌ Order Service not initialized');
+            return [];
+        }
+
+        const uploadedUrls = [];
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${orderId}_${Date.now()}_${i}.${fileExt}`;
+                const filePath = `order-documents/${this.currentUser.id}/${fileName}`;
+
+                // Upload to Supabase Storage
+                const { data, error } = await this.supabase.storage
+                    .from('customer-files')
+                    .upload(filePath, file);
+
+                if (error) throw error;
+
+                // Get public URL
+                const { data: urlData } = this.supabase.storage
+                    .from('customer-files')
+                    .getPublicUrl(filePath);
+
+                uploadedUrls.push({
+                    name: file.name,
+                    url: urlData.publicUrl,
+                    path: filePath
+                });
+            }
+
+            console.log(`✅ Uploaded ${uploadedUrls.length} documents for order ${orderId}`);
+            return uploadedUrls;
+        } catch (error) {
+            console.error('Error uploading order documents:', error);
+            return uploadedUrls; // Return partial results
+        }
+    }
+
+    /**
+     * Load documents for an order
+     * @param {string} orderId
+     * @returns {Promise<Array>}
+     */
+    async loadOrderDocuments(orderId) {
+        if (!this.supabase) return [];
+
+        try {
+            const { data, error } = await this.supabase
+                .from('orders')
+                .select('documents')
+                .eq('id', orderId)
+                .single();
+
+            if (error) throw error;
+
+            return data?.documents ? JSON.parse(data.documents) : [];
+        } catch (error) {
+            console.error('Error loading order documents:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Save document metadata to order
+     * @param {string} orderId
+     * @param {Array} documents
+     * @returns {Promise<boolean>}
+     */
+    async saveOrderDocuments(orderId, documents) {
+        if (!this.supabase) return false;
+
+        try {
+            const { error } = await this.supabase
+                .from('orders')
+                .update({
+                    documents: JSON.stringify(documents),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', orderId);
+
+            if (error) throw error;
+
+            console.log('✅ Order documents metadata saved');
+            return true;
+        } catch (error) {
+            console.error('Error saving order documents:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Delete a document from an order
+     * @param {string} orderId
+     * @param {string} documentPath
+     * @returns {Promise<boolean>}
+     */
+    async deleteOrderDocument(orderId, documentPath) {
+        if (!this.supabase) return false;
+
+        try {
+            // Delete from storage
+            const { error: storageError } = await this.supabase.storage
+                .from('customer-files')
+                .remove([documentPath]);
+
+            if (storageError) throw storageError;
+
+            // Update order documents list
+            const documents = await this.loadOrderDocuments(orderId);
+            const updatedDocuments = documents.filter(doc => doc.path !== documentPath);
+            await this.saveOrderDocuments(orderId, updatedDocuments);
+
+            console.log('✅ Document deleted from order');
+            return true;
+        } catch (error) {
+            console.error('Error deleting order document:', error);
+            return false;
+        }
+    }
 }
 
 // Create singleton instance
