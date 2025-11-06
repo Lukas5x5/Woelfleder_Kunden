@@ -856,6 +856,48 @@ body:not(.logged-out) .login-screen {
     padding: var(--space-sm);
 }
 
+/* Gates Info Badge */
+.gates-info-badge {
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-sm);
+    padding: var(--space-sm);
+    background: linear-gradient(135deg, rgba(200, 16, 46, 0.05) 0%, rgba(200, 16, 46, 0.02) 100%);
+    border-left: 3px solid var(--primary-color);
+    border-radius: var(--radius-sm);
+}
+
+.gates-count {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-xs);
+}
+
+.gates-notes-preview {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* Contact Links in Details */
+.contact-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border-bottom: 1px solid transparent;
+}
+
+.contact-link:hover {
+    color: var(--primary-hover);
+    border-bottom-color: var(--primary-hover);
+}
+
+.contact-link:active {
+    transform: scale(0.98);
+}
+
 /* ========================================
    FLOATING ACTION BUTTON (FAB)
    ======================================== */

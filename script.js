@@ -132,7 +132,14 @@ function renderCustomers(searchTerm = '') {
         return;
     }
 
-    container.innerHTML = filtered.map(customer => `
+    container.innerHTML = filtered.map(customer => {
+        // Get gates info
+        const gatesCount = customer.gates ? customer.gates.length : 0;
+        const gatesNotes = customer.gates && customer.gates.length > 0
+            ? customer.gates.map(g => g.notizen || g.notes).filter(n => n).join(', ').substring(0, 100)
+            : '';
+
+        return `
         <div class="customer-card status-${customer.status}" onclick="showCustomerDetails('${customer.id}')">
             <div class="customer-header">
                 <div class="customer-name">${escapeHtml(customer.name)}</div>
@@ -146,6 +153,12 @@ function renderCustomers(searchTerm = '') {
                 <div class="customer-info-item"><strong>Quelle:</strong> ${getSourceLabel(customer.source)}</div>
                 ${customer.sageRef ? `<div class="customer-info-item"><strong>Sage:</strong> ${escapeHtml(customer.sageRef)}</div>` : ''}
             </div>
+            ${gatesCount > 0 ? `
+                <div class="gates-info-badge">
+                    <div class="gates-count">🚪 ${gatesCount} Tor${gatesCount !== 1 ? 'e' : ''}</div>
+                    ${gatesNotes ? `<div class="gates-notes-preview">${escapeHtml(gatesNotes)}${gatesNotes.length >= 100 ? '...' : ''}</div>` : ''}
+                </div>
+            ` : ''}
             ${customer.appointment ? `
                 <div class="appointment-badge ${isUpcoming(customer.appointment) ? 'upcoming' : ''}">
                     📅 Termin: ${formatAppointment(customer.appointment)}
@@ -161,7 +174,8 @@ function renderCustomers(searchTerm = '') {
                 <button class="btn btn-danger btn-small" onclick="deleteCustomer('${customer.id}')">🗑️ Löschen</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Update Statistics
@@ -381,11 +395,11 @@ function showCustomerDetails(id) {
             <div class="details-grid">
                 <div class="detail-item">
                     <div class="detail-label">Telefon</div>
-                    <div class="detail-value">${customer.phone || '-'}</div>
+                    <div class="detail-value">${customer.phone ? `<a href="tel:${customer.phone}" class="contact-link">${escapeHtml(customer.phone)}</a>` : '-'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Email</div>
-                    <div class="detail-value">${customer.email || '-'}</div>
+                    <div class="detail-value">${customer.email ? `<a href="mailto:${customer.email}" class="contact-link">${escapeHtml(customer.email)}</a>` : '-'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Adresse</div>
