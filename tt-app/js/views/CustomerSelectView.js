@@ -17,12 +17,6 @@ export function renderCustomerSelectView() {
         <div class="card">
             <div class="card-title">Kunde auswählen</div>
 
-            <div class="customer-actions">
-                <button class="btn btn-primary" onclick="window.openNewCustomerModal()">
-                    + Neuer Kunde
-                </button>
-            </div>
-
             ${customers.length === 0 ? `
                 <div class="empty-state">
                     <div class="empty-icon">👤</div>
@@ -37,11 +31,6 @@ export function renderCustomerSelectView() {
                         <div class="customer-card" onclick="window.selectCustomer('${customer.id}')">
                             <div class="customer-header">
                                 <div class="customer-name">${customer.name}</div>
-                                <button class="icon-btn delete"
-                                        onclick="event.stopPropagation(); window.deleteCustomerFromCard('${customer.id}')"
-                                        title="Löschen">
-                                    🗑️
-                                </button>
                             </div>
                             <div class="customer-info">
                                 ${customer.company ? `<div>${customer.company}</div>` : ''}
@@ -116,12 +105,6 @@ export function renderCustomerModal(customer = null) {
                         onclick="window.closeCustomerModal()">
                     Abbrechen
                 </button>
-                ${isEdit ? `
-                    <button type="button" class="btn btn-danger"
-                            onclick="window.deleteCustomer('${customer.id}')">
-                        Löschen
-                    </button>
-                ` : ''}
                 <button type="submit" class="btn btn-primary">
                     ${isEdit ? 'Aktualisieren' : 'Erstellen'}
                 </button>

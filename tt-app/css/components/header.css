@@ -26,7 +26,7 @@
 }
 
 .logo-img {
-    height: 240px;
+    height: 60px;
     width: auto;
     object-fit: contain;
 }
@@ -107,7 +107,7 @@
     }
 
     .logo-img {
-        height: 140px;
+        height: 50px;
     }
 
     .logo-text {
@@ -147,7 +147,7 @@
     }
 
     .logo-img {
-        height: 110px;
+        height: 45px;
     }
 
     .logo {

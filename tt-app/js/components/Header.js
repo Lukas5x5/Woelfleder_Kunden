@@ -7,13 +7,13 @@ export function renderHeader() {
         <div class="header">
             <div class="header-content">
                 <div class="logo-container">
-                    <img src="./tt-app/logo.jpg" alt="Wölfleder Logo" class="logo-img">
+                    <img src="./woelfleder_Logo.jpg" alt="Wölfleder Logo" class="logo-img">
                     <div class="logo-text">
                         <div class="logo-subtitle">Türen & Tore Kalkulator</div>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <a href="index.html" class="app-switcher-tt" title="Zurück zur Kundenverwaltung">
+                    <a href="index.html" class="app-switcher-tt" title="Zurück zur Kundenverwaltung" style="font-size: 2rem; text-decoration: none; padding: 0.5rem;">
                         👥
                     </a>
                 </div>

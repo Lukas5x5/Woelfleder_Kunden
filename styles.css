@@ -1304,3 +1304,80 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-hover);
 }
+
+/* Notification Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+/* Open Orders Dropdown */
+.open-orders-dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card-hover);
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: 0.5rem;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-light);
+    background: var(--gray-bg);
+}
+
+.dropdown-list {
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: var(--gray-bg);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}

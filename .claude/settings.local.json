@@ -17,7 +17,8 @@
       "Bash(timeout 3 cmd:*)",
       "Bash(curl:*)",
       "Bash(.gitignore)",
-      "Bash(dir \"C:\\Users\\LRAus\\Desktop\\Kunden_Programm\\tt-app\")"
+      "Bash(dir \"C:\\Users\\LRAus\\Desktop\\Kunden_Programm\\tt-app\")",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

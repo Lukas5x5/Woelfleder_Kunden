@@ -8,6 +8,7 @@ export class Gate {
         this.name = data.name || '';
         this.gateType = data.gateType || '';
         this.notizen = data.notizen || '';
+        this.orderId = data.orderId || null;
         this.breite = data.breite || 0;
         this.hoehe = data.hoehe || 0;
         this.glashoehe = data.glashoehe || 0;
@@ -173,6 +174,7 @@ export class Gate {
             name: this.name,
             gateType: this.gateType,
             notizen: this.notizen,
+            orderId: this.orderId,
             breite: this.breite,
             hoehe: this.hoehe,
             glashoehe: this.glashoehe,

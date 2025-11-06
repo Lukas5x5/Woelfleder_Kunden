@@ -71,39 +71,43 @@
         <header class="header">
             <div class="header-container">
                 <div class="logo">
-                    <img src="logo.png" alt="Wölfleder Logo" class="logo-img" id="logoImg">
+                    <img src="woelfleder_Logo.jpg" alt="Wölfleder Logo" class="logo-img" id="logoImg">
                     <h1>Wölfleder - Außendienst Manager</h1>
                 </div>
-                <div class="header-actions">
+                <div class="header-actions" style="display: flex; align-items: center; gap: 1rem;">
                     <a href="tore.html" class="app-switcher-compact" title="Zur Tore & Türen App">
                         🚪
                     </a>
-                    <div class="open-orders-dropdown">
-                        <button class="btn btn-info" onclick="toggleOpenOrdersDropdown()" id="openOrdersBtn">
-                            <span>📋</span><span>Offene Aufträge (<span id="openOrdersCount">0</span>)</span>
-                        </button>
-                        <div class="dropdown-content" id="openOrdersDropdown">
+                    <div style="position: relative;">
+                        <span onclick="toggleOpenOrdersDropdown()" id="openOrdersBtn" style="cursor: pointer; font-size: 1.5rem; display: inline-block; padding: 0.25rem;" title="Offene Aufträge">
+                            📋 <small id="openOrdersCount" style="font-size: 0.75rem; color: #666; vertical-align: super;">0</small>
+                        </span>
+                        <div class="dropdown-content" id="openOrdersDropdown" style="display: none;">
                             <div class="dropdown-header">Offene Aufträge</div>
                             <div id="openOrdersList" class="dropdown-list">
                                 <!-- Open orders will be populated here -->
                             </div>
                         </div>
                     </div>
-                    <span id="userEmail" class="user-email"></span>
-                    <button class="btn btn-settings" onclick="showSettingsModal()">
-                        <span>⚙️</span><span>Einstellungen</span>
-                    </button>
-                    <button class="btn btn-primary" onclick="showNewCustomerModal()">
-                        <span>➕</span><span>Neuer Kunde</span>
-                    </button>
-                    <button class="btn btn-logout" onclick="handleLogout()">
-                        <span>↩️</span><span>Abmelden</span>
-                    </button>
+                </div>
+                <div style="text-align: right; margin-top: 0.5rem;">
+                    <span id="userEmail" class="user-email" style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: #6b7280;"></span>
+                    <div class="header-actions">
+                        <button class="btn btn-settings" onclick="showSettingsModal()">
+                            <span>⚙️</span><span>Einstellungen</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="showNewCustomerModal()">
+                            <span>➕</span><span>Neuer Kunde</span>
+                        </button>
+                        <button class="btn btn-logout" onclick="handleLogout()">
+                            <span>↩️</span><span>Abmelden</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Filter & Search -->
+        <!-- Search & Filter -->
         <div class="filter-section">
             <input type="text" id="searchInput" class="search-input" placeholder="🔍 Kunde suchen...">
             <div class="filter-buttons">
@@ -113,7 +117,6 @@
                 <button class="filter-btn" data-filter="angebot">Angebot</button>
                 <button class="filter-btn" data-filter="auftrag">Auftrag</button>
                 <button class="filter-btn" data-filter="abgeschlossen">Abgeschlossen</button>
-                <button class="filter-btn" data-filter="followup">📅 Später kontaktieren</button>
             </div>
         </div>
 
@@ -170,6 +173,11 @@
                     <input type="text" id="customerName" required>
                 </div>
 
+                <div class="form-group">
+                    <label>Firma</label>
+                    <input type="text" id="customerCompany">
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Telefon</label>
@@ -189,12 +197,6 @@
                 <div class="form-group">
                     <label>Notizen</label>
                     <textarea id="customerNotes" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Fotos</label>
-                    <input type="file" id="customerPhotos" accept="image/*" multiple>
-                    <div id="photoPreview" class="photo-preview"></div>
                 </div>
 
                 <div class="form-actions">
@@ -242,6 +244,17 @@
                 </div>
 
                 <div class="settings-section">
+                    <h3>Eigene Auftragsstatus</h3>
+                    <div id="customStatusList" class="custom-types-list">
+                        <!-- Custom status will be displayed here -->
+                    </div>
+                    <div class="add-type-form">
+                        <input type="text" id="newStatusName" placeholder="Neuer Status..." class="settings-input">
+                        <button class="btn btn-primary btn-small" onclick="addCustomStatus()">➕ Hinzufügen</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
                     <h3>Daten sichern & wiederherstellen</h3>
                     <div class="backup-actions">
                         <button class="btn btn-primary" onclick="exportData()">📥 Daten exportieren</button>
@@ -262,7 +275,7 @@
                 <h2 id="orderModalTitle">Neuer Auftrag</h2>
                 <button class="close-btn" onclick="closeOrderModal()">&times;</button>
             </div>
-            <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+            <form id="orderForm" onsubmit="handleOrderSubmit(event)" style="padding: 1.5rem;">
                 <input type="hidden" id="orderId">
                 <input type="hidden" id="orderCustomerId">
 
@@ -318,6 +331,12 @@
                 <div class="form-group">
                     <label for="orderNotes">Notizen</label>
                     <textarea id="orderNotes" rows="4" placeholder="Auftragsnotizen..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Fotos</label>
+                    <input type="file" id="orderPhotos" accept="image/*" multiple>
+                    <div id="orderPhotoPreview" class="photo-preview"></div>
                 </div>
 
                 <div class="form-group">

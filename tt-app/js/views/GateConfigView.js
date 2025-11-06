@@ -573,6 +573,14 @@ window.handleGateSave = function(event) {
         return;
     }
 
+    // Recalculate and save final calculations before persisting
+    const categoryData = productsByCategory[gate.gateType];
+    if (categoryData) {
+        const allProducts = [...categoryData.main, ...categoryData.accessories, ...generalAccessories];
+        const calculations = CalculationService.calculateTotal(gate, allProducts, categoryData.main);
+        gate.updateCalculations(calculations);
+    }
+
     // Check if editing existing gate
     if (gate.id && AppState.currentCustomer.getGate(gate.id)) {
         // Update existing
@@ -585,6 +593,17 @@ window.handleGateSave = function(event) {
     closeModal('gateModal');
     AppState.clearCurrentGate();
     AppState.goToTypeSelect();
+
+    // Notify parent window that gate was saved (for automatic update)
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+            type: 'gate-saved',
+            gateId: gate.id,
+            orderId: gate.orderId,
+            customerId: AppState.currentCustomer?.id
+        }, '*');
+        console.log('✅ Sent gate-saved event to parent window');
+    }
 };
 
 /**

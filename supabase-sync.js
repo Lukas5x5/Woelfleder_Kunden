@@ -20,6 +20,14 @@ async function initSupabaseSync() {
         // Load customers from Supabase on init
         await loadCustomersFromSupabase();
 
+        // Clean up orphaned orders (orders without customers)
+        if (typeof cleanupOrphanedOrders === 'function') {
+            // Run cleanup after a short delay to ensure all data is loaded
+            setTimeout(() => {
+                cleanupOrphanedOrders();
+            }, 2000);
+        }
+
         return true;
     } catch (error) {
         console.error('Error initializing Supabase sync:', error);
