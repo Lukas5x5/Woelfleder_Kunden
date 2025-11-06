@@ -139,6 +139,17 @@ function renderCustomers(searchTerm = '') {
             ? customer.gates.map(g => g.notizen || g.notes).filter(n => n).join(', ').substring(0, 100)
             : '';
 
+        // Debug log for first customer
+        if (filtered[0] === customer) {
+            console.log('🐛 Debug - Customer gates:', {
+                customerName: customer.name,
+                hasGates: !!customer.gates,
+                gatesCount: gatesCount,
+                gates: customer.gates,
+                gatesNotes: gatesNotes
+            });
+        }
+
         return `
         <div class="customer-card status-${customer.status}" onclick="showCustomerDetails('${customer.id}')">
             <div class="customer-header">
