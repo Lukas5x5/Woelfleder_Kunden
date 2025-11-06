@@ -899,6 +899,72 @@ body:not(.logged-out) .login-screen {
 }
 
 /* ========================================
+   ORDERS LIST & CARDS
+   ======================================== */
+
+.orders-list {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.order-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--primary-color);
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.order-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.order-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.order-info-item {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.order-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #0d9668);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #0d9668, var(--success-color));
+}
+
+/* ========================================
    FLOATING ACTION BUTTON (FAB)
    ======================================== */
 

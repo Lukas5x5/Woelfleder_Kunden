@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wölfleder Außendienst Manager</title>
-    <link rel="stylesheet" href="styles-radical.css?v=2.7">
+    <link rel="stylesheet" href="styles-radical.css?v=3.0">
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -301,8 +301,82 @@
         </div>
     </div>
 
+    <!-- Modal: Order (Auftrag) -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="orderModalTitle">Neuer Auftrag</h2>
+                <button class="close-btn" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+                <input type="hidden" id="orderId">
+                <input type="hidden" id="orderCustomerId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderNumber">Auftragsnummer</label>
+                        <input type="text" id="orderNumber" readonly style="background: #f5f7fa;">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderType">Auftragstyp *</label>
+                        <select id="orderType" required>
+                            <option value="standard">Standard</option>
+                            <option value="ausmessen">Ausmessen Tore</option>
+                            <option value="montage">Montage</option>
+                            <option value="reparatur">Reparatur</option>
+                            <option value="wartung">Wartung</option>
+                            <option value="beratung">Beratung</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderStatus">Status *</label>
+                        <select id="orderStatus" required>
+                            <option value="anfrage">Anfrage</option>
+                            <option value="termin">Termin vereinbart</option>
+                            <option value="angebot">Angebot erstellt</option>
+                            <option value="auftrag">Auftrag erteilt</option>
+                            <option value="abgeschlossen">Abgeschlossen</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderSageRef">Sage Nummer</label>
+                        <input type="text" id="orderSageRef" placeholder="z.B. 12345">
+                    </div>
+                    <div class="form-group">
+                        <label for="orderAppointment">Termin</label>
+                        <input type="datetime-local" id="orderAppointment">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderFollowUpDate">Wiedervorlage</label>
+                        <input type="date" id="orderFollowUpDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderNotes">Notizen</label>
+                    <textarea id="orderNotes" rows="4" placeholder="Auftragsnotizen..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="supabase-config.js"></script>
     <script src="supabase-auth.js"></script>
+    <script src="order-service.js"></script>
     <script src="supabase-sync.js"></script>
     <script src="script.js"></script>
 </body>

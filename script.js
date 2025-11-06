@@ -395,14 +395,28 @@ function handlePhotoUpload(e) {
     });
 }
 
-// Show Customer Details
-function showCustomerDetails(id) {
+// Show Customer Details - NEW: Shows Orders instead of direct gates
+async function showCustomerDetails(id) {
     const customer = customers.find(c => c.id === id);
     if (!customer) return;
 
     document.getElementById('detailsName').textContent = customer.name;
 
     const detailsContent = document.getElementById('detailsContent');
+
+    // Show loading state
+    detailsContent.innerHTML = `
+        <div class="details-section">
+            <div class="empty-state">Lade Aufträge...</div>
+        </div>
+    `;
+
+    // Load orders for this customer
+    let orders = [];
+    if (typeof orderService !== 'undefined') {
+        orders = await orderService.loadOrdersForCustomer(customer.id);
+    }
+
     detailsContent.innerHTML = `
         <div class="details-section">
             <h3>Kontaktinformationen</h3>
@@ -419,108 +433,74 @@ function showCustomerDetails(id) {
                     <div class="detail-label">Adresse</div>
                     <div class="detail-value">${customer.address || '-'}</div>
                 </div>
-            </div>
-        </div>
-
-        <div class="details-section">
-            <h3>Auftragsinformationen</h3>
-            <div class="details-grid">
                 <div class="detail-item">
-                    <div class="detail-label">Status</div>
-                    <div class="detail-value">
-                        <span class="customer-status status-${customer.status}">${getStatusLabel(customer.status)}</span>
-                    </div>
+                    <div class="detail-label">Firma</div>
+                    <div class="detail-value">${customer.company || '-'}</div>
                 </div>
-                <div class="detail-item">
-                    <div class="detail-label">Auftragstyp</div>
-                    <div class="detail-value">${getTypeLabel(customer.type)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Quelle</div>
-                    <div class="detail-value">${getSourceLabel(customer.source)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Sage Nummer</div>
-                    <div class="detail-value">${customer.sageRef || '-'}</div>
-                </div>
-                ${customer.appointment ? `
-                    <div class="detail-item">
-                        <div class="detail-label">Termin</div>
-                        <div class="detail-value">${formatAppointment(customer.appointment)}</div>
-                    </div>
-                ` : ''}
-                ${customer.followUpDate ? `
-                    <div class="detail-item">
-                        <div class="detail-label">Wiedervorlage</div>
-                        <div class="detail-value">${formatDate(customer.followUpDate)}</div>
-                    </div>
-                ` : ''}
             </div>
         </div>
 
         ${customer.notes ? `
             <div class="details-section">
-                <h3>Notizen</h3>
+                <h3>Kundennotizen</h3>
                 <div class="detail-item">
                     <div class="detail-value">${escapeHtml(customer.notes).replace(/\n/g, '<br>')}</div>
                 </div>
             </div>
         ` : ''}
 
-        ${customer.photos && customer.photos.length > 0 ? `
-            <div class="details-section">
-                <h3>Fotos (${customer.photos.length})</h3>
-                <div class="photo-gallery">
-                    ${customer.photos.map((photo, i) => `
-                        <div class="gallery-item-wrapper">
-                            <div class="gallery-item" onclick="window.open('${photo}', '_blank')">
-                                <img src="${photo}" alt="Foto ${i + 1}">
-                            </div>
-                            <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${customer.id}', ${i})">
-                                📥 Download
-                            </button>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        ` : ''}
-
-        ${customer.documents && customer.documents.length > 0 ? `
-            <div class="details-section">
-                <h3>Dokumente (${customer.documents.length})</h3>
-                <div class="document-preview">
-                    ${customer.documents.map((doc, i) => `
-                        <div class="document-item">
-                            <div class="document-info">
-                                <span class="document-icon">${getDocumentIcon(doc.name)}</span>
-                                <span class="document-name">${escapeHtml(doc.name)}</span>
-                            </div>
-                            <div class="document-actions">
-                                <button class="document-btn" onclick="viewDocument('${customer.id}', ${i})">👁️ Ansehen</button>
-                                <button class="document-btn" onclick="downloadDocument('${customer.id}', ${i})">📥 Download</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        ` : ''}
-
         <div class="details-section">
-            <div class="collapsible-header" onclick="toggleGatesSection()" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white; font-weight: 600;">
-                    <span id="gatesToggleIcon">▼</span>
-                    Tore & Türen
-                    <span id="gatesLoadingIndicator"></span>
-                </h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Aufträge (${orders.length})</h3>
+                <button class="btn btn-primary" onclick="showNewOrderModal('${customer.id}')">➕ Neuer Auftrag</button>
             </div>
-            <div id="gatesListContainer" style="display: none;">
-                <div class="empty-state">Lade Tore/Türen...</div>
-            </div>
+
+            ${orders.length === 0 ? `
+                <div class="empty-state">
+                    Noch keine Aufträge vorhanden.<br>
+                    <small>Klicken Sie auf "Neuer Auftrag" um einen Auftrag zu erstellen.</small>
+                </div>
+            ` : `
+                <div class="orders-list">
+                    ${orders.map(order => `
+                        <div class="order-card" onclick="showOrderDetails('${order.id}')">
+                            <div class="order-header">
+                                <div class="order-number">${order.order_number}</div>
+                                <span class="customer-status status-${order.status}">${getStatusLabel(order.status)}</span>
+                            </div>
+                            <div class="order-info">
+                                <div class="order-info-item">
+                                    <strong>Typ:</strong> ${getTypeLabel(order.type)}
+                                </div>
+                                ${order.sage_ref ? `
+                                    <div class="order-info-item">
+                                        <strong>Sage:</strong> ${escapeHtml(order.sage_ref)}
+                                    </div>
+                                ` : ''}
+                                <div class="order-info-item">
+                                    <strong>🚪 Tore:</strong> ${order.gateCount}
+                                </div>
+                                ${order.appointment ? `
+                                    <div class="order-info-item">
+                                        <strong>📅 Termin:</strong> ${formatAppointment(order.appointment)}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="order-actions" onclick="event.stopPropagation()">
+                                <button class="btn btn-primary btn-small" onclick="editOrder('${order.id}')">✏️ Bearbeiten</button>
+                                ${order.status !== 'abgeschlossen' ? `
+                                    <button class="btn btn-success btn-small" onclick="completeOrder('${order.id}')">✅ Abschließen</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `}
         </div>
 
         <div class="details-section">
             <div class="detail-item">
-                <div class="detail-label">Erstellt am</div>
+                <div class="detail-label">Kunde erstellt am</div>
                 <div class="detail-value">${new Date(customer.createdAt).toLocaleString('de-DE')}</div>
             </div>
         </div>
@@ -528,9 +508,6 @@ function showCustomerDetails(id) {
 
     document.getElementById('detailsModal').classList.add('active');
     currentEditId = id;
-
-    // Tore/Türen laden
-    loadAndDisplayGates(customer.id);
 }
 
 // Edit from Details Modal
@@ -1183,6 +1160,220 @@ function toggleGatesSection() {
     }
 }
 
+// ========== ORDER FUNCTIONS (AUFTRÄGE) ==========
+
+// Show New Order Modal
+async function showNewOrderModal(customerId) {
+    document.getElementById('orderModalTitle').textContent = 'Neuer Auftrag';
+    document.getElementById('orderForm').reset();
+    document.getElementById('orderId').value = '';
+    document.getElementById('orderCustomerId').value = customerId;
+
+    // Generate order number preview
+    if (typeof orderService !== 'undefined') {
+        const orderNumber = await orderService.generateOrderNumber(customerId);
+        document.getElementById('orderNumber').value = orderNumber;
+    }
+
+    document.getElementById('orderModal').classList.add('active');
+}
+
+// Edit Order
+async function editOrder(orderId) {
+    if (typeof orderService === 'undefined') {
+        alert('Order Service nicht verfügbar');
+        return;
+    }
+
+    const order = await orderService.getOrderById(orderId);
+    if (!order) {
+        alert('Auftrag nicht gefunden');
+        return;
+    }
+
+    document.getElementById('orderModalTitle').textContent = 'Auftrag bearbeiten';
+    document.getElementById('orderId').value = order.id;
+    document.getElementById('orderCustomerId').value = order.customer_id;
+    document.getElementById('orderNumber').value = order.order_number;
+    document.getElementById('orderType').value = order.type;
+    document.getElementById('orderStatus').value = order.status;
+    document.getElementById('orderSageRef').value = order.sage_ref || '';
+    document.getElementById('orderAppointment').value = order.appointment || '';
+    document.getElementById('orderFollowUpDate').value = order.follow_up_date || '';
+    document.getElementById('orderNotes').value = order.notes || '';
+
+    document.getElementById('orderModal').classList.add('active');
+}
+
+// Handle Order Form Submit
+async function handleOrderSubmit(event) {
+    event.preventDefault();
+
+    if (typeof orderService === 'undefined') {
+        alert('Order Service nicht verfügbar');
+        return;
+    }
+
+    const orderId = document.getElementById('orderId').value;
+    const customerId = document.getElementById('orderCustomerId').value;
+
+    const orderData = {
+        type: document.getElementById('orderType').value,
+        status: document.getElementById('orderStatus').value,
+        sageRef: document.getElementById('orderSageRef').value,
+        appointment: document.getElementById('orderAppointment').value,
+        followUpDate: document.getElementById('orderFollowUpDate').value,
+        notes: document.getElementById('orderNotes').value
+    };
+
+    let success = false;
+
+    if (orderId) {
+        // Update existing order
+        success = await orderService.updateOrder(orderId, orderData);
+        if (success) {
+            alert('Auftrag erfolgreich aktualisiert!');
+        }
+    } else {
+        // Create new order
+        const newOrder = await orderService.createOrder(customerId, orderData);
+        success = newOrder !== null;
+        if (success) {
+            alert('Auftrag erfolgreich erstellt!');
+        }
+    }
+
+    if (success) {
+        closeOrderModal();
+        // Refresh customer details
+        showCustomerDetails(customerId);
+    } else {
+        alert('Fehler beim Speichern des Auftrags');
+    }
+}
+
+// Close Order Modal
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.remove('active');
+}
+
+// Complete Order (Mark as Abgeschlossen)
+async function completeOrder(orderId) {
+    if (!confirm('Auftrag als abgeschlossen markieren?')) {
+        return;
+    }
+
+    if (typeof orderService === 'undefined') {
+        alert('Order Service nicht verfügbar');
+        return;
+    }
+
+    const success = await orderService.completeOrder(orderId);
+
+    if (success) {
+        alert('Auftrag abgeschlossen!');
+        // Refresh the customer details view
+        const order = await orderService.getOrderById(orderId);
+        if (order) {
+            showCustomerDetails(order.customer_id);
+        }
+    } else {
+        alert('Fehler beim Abschließen des Auftrags');
+    }
+}
+
+// Show Order Details (with gates)
+async function showOrderDetails(orderId) {
+    if (typeof orderService === 'undefined') {
+        alert('Order Service nicht verfügbar');
+        return;
+    }
+
+    const order = await orderService.getOrderById(orderId);
+    if (!order) {
+        alert('Auftrag nicht gefunden');
+        return;
+    }
+
+    // Create a modal for order details
+    const modalContent = `
+        <div style="padding: 1.5rem;">
+            <h2 style="margin-bottom: 1rem;">${order.order_number}</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">Status</div>
+                    <div><span class="customer-status status-${order.status}">${getStatusLabel(order.status)}</span></div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">Typ</div>
+                    <div>${getTypeLabel(order.type)}</div>
+                </div>
+                ${order.sage_ref ? `
+                    <div>
+                        <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">Sage Nummer</div>
+                        <div>${escapeHtml(order.sage_ref)}</div>
+                    </div>
+                ` : ''}
+                ${order.appointment ? `
+                    <div>
+                        <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">Termin</div>
+                        <div>${formatAppointment(order.appointment)}</div>
+                    </div>
+                ` : ''}
+            </div>
+
+            ${order.notes ? `
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Notizen</h3>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        ${escapeHtml(order.notes).replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <div style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Tore/Türen (${order.gates.length})</h3>
+            </div>
+
+            ${order.gates.length === 0 ? `
+                <div class="empty-state">Noch keine Tore für diesen Auftrag erstellt</div>
+            ` : `
+                <div style="display: grid; gap: 1rem;">
+                    ${order.gates.map(gate => `
+                        <div style="padding: 1rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer;" onclick="showGateDetails('${gate.id}')">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">${gate.name || 'Tor'}</div>
+                            <div style="font-size: 0.85rem; color: #6b7280;">
+                                ${gate.breite && gate.hoehe ? `${(gate.breite/100).toFixed(2)}m × ${(gate.hoehe/100).toFixed(2)}m` : 'Keine Maße'}
+                            </div>
+                            ${gate.inkl_mwst ? `
+                                <div style="font-weight: 600; color: #c8102e; margin-top: 0.5rem;">
+                                    ${formatCurrency(gate.inkl_mwst)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `}
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-primary" onclick="editOrder('${order.id}'); closeGateDetailsModal();">✏️ Bearbeiten</button>
+                ${order.status !== 'abgeschlossen' ? `
+                    <button class="btn btn-success" onclick="completeOrder('${order.id}'); closeGateDetailsModal();">✅ Abschließen</button>
+                ` : ''}
+                <button class="btn btn-secondary" onclick="closeGateDetailsModal()">Schließen</button>
+            </div>
+        </div>
+    `;
+
+    // Reuse gate details modal
+    const modal = document.getElementById('gateDetailsModal');
+    if (modal) {
+        modal.querySelector('.modal-content').innerHTML = modalContent;
+        modal.classList.add('active');
+    }
+}
+
 // Format currency helper
 function formatCurrency(value) {
     if (!value && value !== 0) return '-';
@@ -1197,6 +1388,7 @@ window.onclick = function(event) {
     const customerModal = document.getElementById('customerModal');
     const detailsModal = document.getElementById('detailsModal');
     const settingsModal = document.getElementById('settingsModal');
+    const orderModal = document.getElementById('orderModal');
 
     if (event.target === customerModal) {
         closeModal();
@@ -1206,6 +1398,9 @@ window.onclick = function(event) {
     }
     if (event.target === settingsModal) {
         closeSettingsModal();
+    }
+    if (event.target === orderModal) {
+        closeOrderModal();
     }
 }
 

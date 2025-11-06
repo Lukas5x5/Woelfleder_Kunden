@@ -53,6 +53,12 @@ async function checkAuth() {
         if (session) {
             currentUser = session.user;
 
+            // Initialize Order Service
+            if (typeof orderService !== 'undefined') {
+                orderService.init(supabaseClient, currentUser);
+                console.log('✅ Order Service initialized');
+            }
+
             // Dispatch event that user is authenticated (for TT-App)
             window.dispatchEvent(new CustomEvent('supabase-user-ready', {
                 detail: { user: currentUser }

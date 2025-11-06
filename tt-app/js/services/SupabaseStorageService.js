@@ -232,6 +232,7 @@ class SupabaseStorageService {
                 id: gateId,
                 user_id: this.currentUser.id,
                 customer_id: customerId,
+                order_id: gateData.orderId || null,  // NEW: Support for orders
 
                 // Basic Info
                 name: gateData.name || '',
@@ -296,6 +297,9 @@ class SupabaseStorageService {
             const { error } = await this.supabase
                 .from('gates')
                 .update({
+                    // Order ID (NEW: Support for orders)
+                    order_id: gateData.orderId || null,
+
                     // Basic Info
                     name: gateData.name || '',
                     gate_type: gateData.gateType || gateData.type || 'unknown',
